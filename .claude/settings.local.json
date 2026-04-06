@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh auth:*)",
+      "Bash(git config:*)",
+      "Bash(git --version)",
+      "Bash(npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias \"@/*\" --no-turbopack)",
+      "Bash(npm install:*)",
+      "Bash(npx shadcn@latest init --defaults)",
+      "Bash(npx shadcn@latest add badge card dialog dropdown-menu input label select separator sheet sidebar skeleton table tabs textarea toast)",
+      "Bash(mkdir:*)"
+    ]
+  }
+}
