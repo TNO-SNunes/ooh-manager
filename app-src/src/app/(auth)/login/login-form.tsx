@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import Link from 'next/link'
 
 export function LoginForm() {
   const router = useRouter()
@@ -58,6 +59,11 @@ export function LoginForm() {
           required
           autoComplete="current-password"
         />
+        <div className="text-right">
+          <Link href="/login/reset" className="text-xs text-muted-foreground underline underline-offset-4">
+            Esqueci minha senha
+          </Link>
+        </div>
       </div>
 
       {error && (
