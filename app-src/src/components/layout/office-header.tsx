@@ -7,6 +7,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -85,26 +86,33 @@ export function OfficeHeader({ profile }: { profile: Usuario }) {
           </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuLabel className="font-normal">
-            <p className="text-sm font-medium">{profile.nome}</p>
-            <p className="text-xs text-muted-foreground">
-              {PERFIL_LABEL[profile.perfil] ?? profile.perfil}
-            </p>
-          </DropdownMenuLabel>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="font-normal">
+              <p className="text-sm font-medium">{profile.nome}</p>
+              <p className="text-xs text-muted-foreground">
+                {PERFIL_LABEL[profile.perfil] ?? profile.perfil}
+              </p>
+            </DropdownMenuLabel>
+          </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={() => router.push('/configuracoes')}
-            className="flex items-center gap-2"
-          >
-            <User className="h-4 w-4" /> Meu perfil
-          </DropdownMenuItem>
+          <DropdownMenuGroup>
+            <DropdownMenuItem
+              onClick={() => router.push('/configuracoes')}
+              className="flex items-center gap-2"
+            >
+              <User className="h-4 w-4" /> Meu perfil
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
           <DropdownMenuSeparator />
-          <DropdownMenuItem
-            onClick={handleLogout}
-            className="flex items-center gap-2 text-destructive focus:text-destructive"
-          >
-            <LogOut className="h-4 w-4" /> Sair
-          </DropdownMenuItem>
+          <DropdownMenuGroup>
+            <DropdownMenuItem
+              onClick={handleLogout}
+              variant="destructive"
+              className="flex items-center gap-2"
+            >
+              <LogOut className="h-4 w-4" /> Sair
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
     </header>
