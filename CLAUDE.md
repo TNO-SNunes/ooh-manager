@@ -95,16 +95,23 @@ SaaS para empresas de mídia exterior (OOH/DOOH) gerenciarem inventário de pont
 - [x] Migration SQL completa com RLS por perfil
 - [x] Repositório GitHub criado e com push
 
-### Sprint 1 — PRÓXIMO
-**Objetivo:** Projeto rodando com auth e layout base por perfil
+### Sprint 1 — PLANO PRONTO, AGUARDANDO EXECUÇÃO
 
-Tarefas:
-- [ ] Setup Supabase (criar projeto, aplicar migration, configurar .env.local)
-- [ ] Auth flow completo: login, logout, sessão persistente
-- [ ] Layout base: sidebar desktop + bottom tabs mobile, itens filtrados por perfil
-- [ ] Dashboard inicial por perfil (placeholder)
-- [ ] Deploy no Vercel conectado ao Supabase
-- [ ] Seed de dados de teste
+**Spec:** `docs/superpowers/specs/2026-04-06-sprint1-auth-layout-design.md`  
+**Plano:** `docs/superpowers/plans/2026-04-06-sprint1-auth-layout.md` (14 tasks, código completo)
+
+**Para retomar:** dizer "vamos executar o Sprint 1" e invocar `superpowers:subagent-driven-development` com o plano acima.
+
+**Decisões de design aprovadas no Sprint 1:**
+- Desktop: OfficeLayout com sidebar fixa (240px) + Sheet no mobile
+- Mobile campo: FieldLayout com 2 bottom tabs (Funcionário/Checkin)
+- Tema: Light padrão + toggle dark/light (next-themes); Field sem toggle
+- Mídia também pode aprovar/rejeitar reservas (mudança de regra — migration 002 criada)
+- Configurações acessível a todos; Admin edita empresa, demais só telefone + foto
+
+**Pré-requisito antes de executar:**
+- Criar `.env.local` em `app-src/` com credenciais do Supabase
+- Aplicar `supabase/migrations/001_initial_schema.sql` no SQL Editor do Supabase
 
 ---
 
