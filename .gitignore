@@ -17,3 +17,6 @@ yarn-debug.log*
 
 # Vercel
 app-src/.vercel
+
+# Superpowers visual companion
+.superpowers/
