@@ -20,3 +20,6 @@ app-src/.vercel
 
 # Superpowers visual companion
 .superpowers/
+
+# Git worktrees
+.worktrees/
