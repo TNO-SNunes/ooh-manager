@@ -50,10 +50,10 @@ export function OfficeHeader({ profile }: { profile: Usuario }) {
     <header className="flex h-14 items-center gap-2 border-b bg-background px-4">
       {/* Hamburger — mobile only */}
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-        <SheetTrigger asChild>
-          <Button variant="ghost" size="icon" className="md:hidden">
-            <Menu className="h-5 w-5" />
-          </Button>
+        <SheetTrigger
+          render={<Button variant="ghost" size="icon" className="md:hidden" />}
+        >
+          <Menu className="h-5 w-5" />
         </SheetTrigger>
         <SheetContent side="left" className="p-0 w-60">
           <OfficeSidebar perfil={profile.perfil} />
@@ -75,14 +75,14 @@ export function OfficeHeader({ profile }: { profile: Usuario }) {
 
       {/* Avatar dropdown */}
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 rounded-full p-0">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="text-xs">
-                {getInitials(profile.nome)}
-              </AvatarFallback>
-            </Avatar>
-          </Button>
+        <DropdownMenuTrigger
+          render={<Button variant="ghost" className="h-8 w-8 rounded-full p-0" />}
+        >
+          <Avatar className="h-8 w-8">
+            <AvatarFallback className="text-xs">
+              {getInitials(profile.nome)}
+            </AvatarFallback>
+          </Avatar>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuLabel className="font-normal">
@@ -92,10 +92,11 @@ export function OfficeHeader({ profile }: { profile: Usuario }) {
             </p>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem asChild>
-            <a href="/configuracoes" className="flex items-center gap-2">
-              <User className="h-4 w-4" /> Meu perfil
-            </a>
+          <DropdownMenuItem
+            onClick={() => router.push('/configuracoes')}
+            className="flex items-center gap-2"
+          >
+            <User className="h-4 w-4" /> Meu perfil
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
