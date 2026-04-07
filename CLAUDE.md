@@ -95,23 +95,25 @@ SaaS para empresas de mídia exterior (OOH/DOOH) gerenciarem inventário de pont
 - [x] Migration SQL completa com RLS por perfil
 - [x] Repositório GitHub criado e com push
 
-### Sprint 1 — PLANO PRONTO, AGUARDANDO EXECUÇÃO
+### Sprint 1 — CONCLUÍDO
+- [x] Auth flow: login, logout, reset de senha, middleware de proteção
+- [x] AuthContext com AuthProvider + useAuthContext
+- [x] OfficeLayout: sidebar fixa 240px (desktop) + Sheet mobile, header com toggle dark/light e avatar
+- [x] FieldLayout: header com badge online/offline (Checkin), 2 bottom tabs
+- [x] Navegação filtrada por perfil (nav-items.ts, TDD — 9 testes)
+- [x] ThemeProvider (next-themes) — Light padrão, toggle persistido
+- [x] Dashboard por perfil + 8 rotas placeholder
+- [x] Migration 002: Mídia pode aprovar/rejeitar reservas
+- [x] PR: https://github.com/TNO-SNunes/ooh-manager/pull/1 (branch: feat/sprint-1-auth-layout)
 
-**Spec:** `docs/superpowers/specs/2026-04-06-sprint1-auth-layout-design.md`  
-**Plano:** `docs/superpowers/plans/2026-04-06-sprint1-auth-layout.md` (14 tasks, código completo)
+**Nota técnica:** shadcn/ui neste projeto usa `@base-ui/react` (não Radix UI). `asChild` não existe — usar `render` prop nos triggers.
 
-**Para retomar:** dizer "vamos executar o Sprint 1" e invocar `superpowers:subagent-driven-development` com o plano acima.
+**Pendente (aplicar no Supabase):**
+- `supabase/migrations/001_initial_schema.sql` (schema inicial)
+- `supabase/migrations/002_rls_midia_reservas.sql` (Mídia aprovação)
 
-**Decisões de design aprovadas no Sprint 1:**
-- Desktop: OfficeLayout com sidebar fixa (240px) + Sheet no mobile
-- Mobile campo: FieldLayout com 2 bottom tabs (Funcionário/Checkin)
-- Tema: Light padrão + toggle dark/light (next-themes); Field sem toggle
-- Mídia também pode aprovar/rejeitar reservas (mudança de regra — migration 002 criada)
-- Configurações acessível a todos; Admin edita empresa, demais só telefone + foto
-
-**Pré-requisito antes de executar:**
-- Criar `.env.local` em `app-src/` com credenciais do Supabase
-- Aplicar `supabase/migrations/001_initial_schema.sql` no SQL Editor do Supabase
+### Sprint 2 — PRÓXIMO
+Ver `docs/ROADMAP.md` para detalhes do Sprint 2 (Inventário de pontos).
 
 ---
 
