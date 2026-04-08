@@ -32,6 +32,12 @@ function parsearIluminacao(valor: unknown): boolean {
   return s === 'sim' || s === '1' || s === 'true'
 }
 
+function parsearNumero(valor: unknown): number | undefined {
+  if (valor === '' || valor === null || valor === undefined) return undefined
+  const n = Number(valor)
+  return isNaN(n) ? undefined : n
+}
+
 export function parsearImportacao(buffer: ArrayBuffer): LinhaImportacao[] {
   const uint8array = new Uint8Array(buffer)
   const wb = XLSX.read(uint8array, { type: 'array' })
@@ -63,8 +69,11 @@ export function parsearImportacao(buffer: ArrayBuffer): LinhaImportacao[] {
       return { linha, erro: `linha ${linha} — campos obrigatórios ausentes: ${ausentes.join(', ')}` }
     }
 
-    const statusRaw = String(row['status'] ?? 'ativo').toLowerCase().trim() as StatusPonto
-    const status = STATUS_VALIDOS.includes(statusRaw) ? statusRaw : 'ativo'
+    const statusRaw = String(row['status'] ?? '').toLowerCase().trim()
+    if (statusRaw && !STATUS_VALIDOS.includes(statusRaw as StatusPonto)) {
+      return { linha, erro: `linha ${linha} — status inválido: "${row['status']}" (use: ativo, inativo, manutencao)` }
+    }
+    const status: StatusPonto = STATUS_VALIDOS.includes(statusRaw as StatusPonto) ? (statusRaw as StatusPonto) : 'ativo'
 
     const dados: Partial<PontoMidia> = {
       tipo,
@@ -77,14 +86,14 @@ export function parsearImportacao(buffer: ArrayBuffer): LinhaImportacao[] {
       municipio,
       cidade,
       estado,
-      latitude: row['latitude'] !== '' ? Number(row['latitude']) : undefined,
-      longitude: row['longitude'] !== '' ? Number(row['longitude']) : undefined,
-      largura_m: row['largura_m'] !== '' ? Number(row['largura_m']) : undefined,
-      altura_m: row['altura_m'] !== '' ? Number(row['altura_m']) : undefined,
+      latitude: parsearNumero(row['latitude']),
+      longitude: parsearNumero(row['longitude']),
+      largura_m: parsearNumero(row['largura_m']),
+      altura_m: parsearNumero(row['altura_m']),
       iluminacao: parsearIluminacao(row['iluminacao']),
-      numero_painel: row['numero_painel'] !== '' ? Number(row['numero_painel']) : undefined,
-      slots_totais: row['slots_totais'] !== '' ? Number(row['slots_totais']) : undefined,
-      slot_duracao_s: row['slot_duracao_s'] !== '' ? Number(row['slot_duracao_s']) : undefined,
+      numero_painel: parsearNumero(row['numero_painel']),
+      slots_totais: parsearNumero(row['slots_totais']),
+      slot_duracao_s: parsearNumero(row['slot_duracao_s']),
       resolucao: String(row['resolucao'] ?? '').trim() || undefined,
       observacoes: String(row['observacoes'] ?? '').trim() || undefined,
     }
