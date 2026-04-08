@@ -3,16 +3,11 @@
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
+import { validarCliente } from '@/lib/clientes/validacoes'
 
 export type ActionState = {
   error?: string
   fieldErrors?: Record<string, string>
-}
-
-function validarCliente(data: { nome?: string }): Record<string, string> | null {
-  const errors: Record<string, string> = {}
-  if (!data.nome?.trim()) errors.nome = 'Nome é obrigatório.'
-  return Object.keys(errors).length ? errors : null
 }
 
 function parseCampos(formData: FormData) {
