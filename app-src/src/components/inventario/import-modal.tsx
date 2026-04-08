@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useRef } from 'react'
+import { useActionState, useRef, useEffect } from 'react'
 import { DownloadIcon } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -28,6 +28,12 @@ const initialState: ImportState = {}
 export function ImportModal({ open, onOpenChange, importarPontos }: ImportModalProps) {
   const fileRef = useRef<HTMLInputElement>(null)
   const [state, formAction, pending] = useActionState(importarPontos, initialState)
+
+  useEffect(() => {
+    if ((state as { importados?: number }).importados !== undefined && fileRef.current) {
+      fileRef.current.value = ''
+    }
+  }, [(state as { importados?: number }).importados])
 
   function handleDownloadTemplate() {
     const base64 = gerarTemplateExcel()
