@@ -81,6 +81,34 @@ describe('calcularDisponibilidade — com reservas sobrepostas', () => {
     expect(r.status).toBe('livre')
     expect(r.slots_livres).toBe(4)
   })
+
+  it('empena com reserva sobreposta → ocupado', () => {
+    const pontoEmpena: PontoMidia = {
+      ...pontoOutdoor, id: 'p4', codigo: 'EMP-001', nome: 'Ponto Empena', tipo: 'empena',
+    }
+    const reservas = [{ data_inicio: '2024-05-01', data_fim: '2024-05-31', slot_numero: null }]
+    const r = calcularDisponibilidade(pontoEmpena, reservas, [], '2024-05-01', '2024-05-31')
+    expect(r.status).toBe('ocupado')
+  })
+
+  it('led com mesmo slot em sub-períodos sobrepostos conta como 1 slot ocupado', () => {
+    const reservas = [
+      { data_inicio: '2024-05-01', data_fim: '2024-05-15', slot_numero: 1 },
+      { data_inicio: '2024-05-10', data_fim: '2024-05-31', slot_numero: 1 },
+    ]
+    const r = calcularDisponibilidade(pontoLed, reservas, [], '2024-05-01', '2024-05-31')
+    expect(r.status).toBe('parcial')
+    expect(r.slots_livres).toBe(3)
+  })
+
+  it('led com slots_totais não configurado → ocupado (dados inválidos)', () => {
+    const pontoLedSemSlots: PontoMidia = {
+      ...pontoOutdoor, id: 'p5', codigo: 'LED-002', nome: 'LED sem slots', tipo: 'led',
+      // slots_totais undefined
+    }
+    const r = calcularDisponibilidade(pontoLedSemSlots, [], [], '2024-05-01', '2024-05-31')
+    expect(r.status).toBe('ocupado')
+  })
 })
 
 describe('calcularDisponibilidade — bloqueios de manutenção', () => {

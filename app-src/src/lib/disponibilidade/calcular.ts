@@ -11,7 +11,7 @@ interface BloqueioInfo {
   data_fim: string
 }
 
-interface ResultadoDisponibilidade {
+export interface ResultadoDisponibilidade {
   status: StatusDisponibilidade
   slots_livres?: number
   slots_totais?: number
@@ -54,6 +54,9 @@ export function calcularDisponibilidade(
 
   if (ponto.tipo === 'led') {
     const slotsTotais = ponto.slots_totais ?? 0
+    if (slotsTotais <= 0) {
+      return { status: 'ocupado', slots_livres: 0, slots_totais: 0 }
+    }
     const slotsOcupados = new Set(
       reservasSobrepostas
         .map((r) => r.slot_numero)
