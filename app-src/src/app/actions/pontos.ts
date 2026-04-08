@@ -19,11 +19,12 @@ function formDataToPonto(formData: FormData): Partial<PontoMidia> {
     const val = formData.get(key)
     return val ? String(val).trim() : undefined
   }
-  const getNum = (key: string) => {
+  const getNum = (key: string, decimals?: number) => {
     const val = get(key)
     if (!val) return undefined
     const n = parseFloat(val)
-    return isNaN(n) ? undefined : n
+    if (isNaN(n)) return undefined
+    return decimals !== undefined ? parseFloat(n.toFixed(decimals)) : n
   }
   const getInt = (key: string) => {
     const val = get(key)
@@ -43,10 +44,10 @@ function formDataToPonto(formData: FormData): Partial<PontoMidia> {
     municipio: get('municipio'),
     cidade: get('cidade'),
     estado: get('estado'),
-    latitude: getNum('latitude'),
-    longitude: getNum('longitude'),
-    largura_m: getNum('largura_m'),
-    altura_m: getNum('altura_m'),
+    latitude: getNum('latitude', 8),
+    longitude: getNum('longitude', 8),
+    largura_m: getNum('largura_m', 2),
+    altura_m: getNum('altura_m', 2),
     iluminacao: formData.get('iluminacao') === 'true',
     numero_painel: getInt('numero_painel'),
     slots_totais: getInt('slots_totais'),

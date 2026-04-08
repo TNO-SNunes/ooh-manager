@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useCallback, useTransition, useRef } from 'react'
-import { Eye, Pencil, Download, Plus, Upload } from 'lucide-react'
+import { Eye, Pencil, Download, Plus, Upload, MapPin } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -118,12 +118,13 @@ export function PontoTable({
       q: q || undefined,
     }
     try {
-      const csvContent = await exportarPontosAction(filtros)
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+      const base64 = await exportarPontosAction(filtros)
+      const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0))
+      const blob = new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `pontos-midia-${new Date().toISOString().slice(0, 10)}.csv`
+      a.download = `pontos-midia-${new Date().toISOString().slice(0, 10)}.xlsx`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
@@ -230,7 +231,7 @@ export function PontoTable({
         <div className="flex gap-2">
           {podeAdminGerente && (
             <>
-              <Button size="sm" render={<Link href="/inventario/novo" />}>
+              <Button size="sm" nativeButton={false} render={<Link href="/inventario/novo" />}>
                 <Plus className="mr-1 size-4" />
                 Novo Ponto
               </Button>
@@ -286,7 +287,7 @@ export function PontoTable({
                       <Button
                         variant="ghost"
                         size="sm"
-                        render={<Link href={`/inventario/${ponto.id}`} />}
+                        nativeButton={false} render={<Link href={`/inventario/${ponto.id}`} />}
                       >
                         <Eye className="size-4" />
                         <span className="sr-only">Ver</span>
@@ -295,10 +296,26 @@ export function PontoTable({
                         <Button
                           variant="ghost"
                           size="sm"
-                          render={<Link href={`/inventario/${ponto.id}/editar`} />}
+                          nativeButton={false} render={<Link href={`/inventario/${ponto.id}/editar`} />}
                         >
                           <Pencil className="size-4" />
                           <span className="sr-only">Editar</span>
+                        </Button>
+                      )}
+                      {ponto.latitude && ponto.longitude ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          nativeButton={false}
+                          render={<Link href={`https://www.google.com/maps?q=${ponto.latitude},${ponto.longitude}`} target="_blank" rel="noopener noreferrer" />}
+                        >
+                          <MapPin className="size-4" />
+                          <span className="sr-only">Ver no mapa</span>
+                        </Button>
+                      ) : (
+                        <Button variant="ghost" size="sm" disabled>
+                          <MapPin className="size-4 opacity-30" />
+                          <span className="sr-only">Sem coordenadas</span>
                         </Button>
                       )}
                     </div>
