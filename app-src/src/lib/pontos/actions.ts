@@ -65,7 +65,7 @@ export function validarPonto(data: Partial<PontoMidia>): ErroValidacao[] {
     if (!data.slots_totais || data.slots_totais < 1) {
       erros.push({ campo: 'slots_totais', mensagem: 'Cotas totais deve ser pelo menos 1' })
     }
-    if (data.slot_duracao_s !== undefined && ![10, 15].includes(data.slot_duracao_s)) {
+    if (!data.slot_duracao_s || ![10, 15].includes(data.slot_duracao_s)) {
       erros.push({ campo: 'slot_duracao_s', mensagem: 'Duração deve ser 10 ou 15 segundos' })
     }
   }

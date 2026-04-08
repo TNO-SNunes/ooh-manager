@@ -105,6 +105,11 @@ describe('validarPonto', () => {
     expect(validarPonto({ ...base, tipo: 'led', slots_totais: 4, slot_duracao_s: 10 })).toHaveLength(0)
   })
 
+  it('LED: exige slot_duracao_s quando tipo é led', () => {
+    const errosSemDuracao = validarPonto({ ...base, tipo: 'led', slots_totais: 4 })
+    expect(errosSemDuracao.map(e => e.campo)).toContain('slot_duracao_s')
+  })
+
   it('se latitude preenchida, longitude também deve ser e vice-versa', () => {
     const erros = validarPonto({ ...base, latitude: -22.9 })
     expect(erros.map(e => e.campo)).toContain('longitude')
