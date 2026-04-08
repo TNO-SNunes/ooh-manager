@@ -46,6 +46,7 @@ export default async function ClientesPage({
         total={count ?? 0}
         pagina={pagina}
         perfil={perfil.perfil as PerfilUsuario}
+        porPagina={POR_PAGINA}
       />
     </div>
   )

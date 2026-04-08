@@ -12,16 +12,15 @@ import {
 } from '@/components/ui/table'
 import type { Cliente, PerfilUsuario } from '@/types'
 
-const ITENS_POR_PAGINA = 20
-
 interface ClienteTableProps {
   clientes: Cliente[]
   total: number
   pagina: number
   perfil: PerfilUsuario
+  porPagina: number
 }
 
-export function ClienteTable({ clientes, total, pagina, perfil }: ClienteTableProps) {
+export function ClienteTable({ clientes, total, pagina, perfil, porPagina }: ClienteTableProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -29,7 +28,7 @@ export function ClienteTable({ clientes, total, pagina, perfil }: ClienteTablePr
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const podeGerenciar = perfil === 'admin' || perfil === 'gerente' || perfil === 'vendedor'
-  const totalPaginas = Math.max(1, Math.ceil(total / ITENS_POR_PAGINA))
+  const totalPaginas = Math.max(1, Math.ceil(total / porPagina))
   const q = searchParams.get('q') ?? ''
 
   const buildUrl = useCallback(

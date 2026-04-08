@@ -23,7 +23,8 @@ export function ClienteDetail({ cliente, campanhas, perfil }: ClienteDetailProps
 
   async function handleExcluir() {
     if (!confirm(`Excluir cliente "${cliente.nome}"? Isso também excluirá todas as campanhas sem reservas.`)) return
-    await excluirCliente(cliente.id)
+    const result = await excluirCliente(cliente.id)
+    if (result?.error) alert(result.error)
   }
 
   return (
