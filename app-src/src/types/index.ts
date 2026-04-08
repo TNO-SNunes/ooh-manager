@@ -74,15 +74,20 @@ export interface PontoMidia {
   cidade: string
   estado: string
   endereco?: string
+  sentido?: string
+  bairro?: string
+  municipio?: string
   latitude?: number
   longitude?: number
   largura_m?: number
   altura_m?: number
   iluminacao: boolean
   face?: string
+  numero_painel?: number
   // LED-specific
   slot_duracao_s?: number
   slots_totais?: number
+  resolucao?: string
   fotos_urls?: string[]
   observacoes?: string
   criado_em: string
