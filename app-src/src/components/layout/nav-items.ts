@@ -1,6 +1,8 @@
 import {
   LayoutDashboard,
   MapPin,
+  Building2,
+  Megaphone,
   CalendarCheck,
   Calendar,
   CalendarSearch,
@@ -28,6 +30,8 @@ const ALL_SECTIONS: NavSection[] = [
     items: [
       { label: 'Dashboard',       href: '/',               icon: LayoutDashboard },
       { label: 'Inventário',      href: '/inventario',     icon: MapPin },
+      { label: 'Clientes',        href: '/clientes',       icon: Building2 },
+      { label: 'Campanhas',       href: '/campanhas',      icon: Megaphone },
       { label: 'Reservas',        href: '/reservas',       icon: CalendarCheck },
       { label: 'Calendário',      href: '/calendario',     icon: Calendar },
       { label: 'Disponibilidade', href: '/disponibilidade',icon: CalendarSearch },
@@ -45,10 +49,10 @@ const ALL_SECTIONS: NavSection[] = [
 ]
 
 const ALLOWED: Record<PerfilUsuario, string[]> = {
-  admin:       ['/', '/inventario', '/reservas', '/calendario', '/disponibilidade', '/os', '/relatorios', '/usuarios', '/configuracoes'],
-  gerente:     ['/', '/inventario', '/reservas', '/calendario', '/disponibilidade', '/os', '/relatorios', '/usuarios', '/configuracoes'],
-  vendedor:    ['/', '/reservas', '/calendario', '/disponibilidade', '/relatorios', '/configuracoes'],
-  midia:       ['/', '/inventario', '/reservas', '/os', '/relatorios', '/configuracoes'],
+  admin:       ['/', '/inventario', '/clientes', '/campanhas', '/reservas', '/calendario', '/disponibilidade', '/os', '/relatorios', '/usuarios', '/configuracoes'],
+  gerente:     ['/', '/inventario', '/clientes', '/campanhas', '/reservas', '/calendario', '/disponibilidade', '/os', '/relatorios', '/usuarios', '/configuracoes'],
+  vendedor:    ['/', '/clientes', '/campanhas', '/reservas', '/calendario', '/disponibilidade', '/relatorios', '/configuracoes'],
+  midia:       ['/', '/inventario', '/clientes', '/campanhas', '/reservas', '/os', '/relatorios', '/configuracoes'],
   funcionario: [],
   checkin:     [],
 }

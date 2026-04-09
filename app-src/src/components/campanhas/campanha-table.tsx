@@ -1,16 +1,17 @@
 'use client'
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import { useCallback, useTransition, useRef } from 'react'
+import { useCallback, useTransition, useRef, useState } from 'react'
 import { Eye, Pencil, Plus } from 'lucide-react'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   Table, TableBody, TableCell, TableHead,
   TableHeader, TableRow,
 } from '@/components/ui/table'
-import type { Campanha, PerfilUsuario } from '@/types'
+import { CampanhaSheetDetalhe } from '@/components/campanhas/campanha-sheet-detalhe'
+import { CampanhaSheetForm } from '@/components/campanhas/campanha-sheet-form'
+import type { Campanha, Cliente, PerfilUsuario } from '@/types'
 
 const ITENS_POR_PAGINA = 20
 
@@ -19,15 +20,19 @@ interface CampanhaTableProps {
   total: number
   pagina: number
   perfil: PerfilUsuario
+  clientes: Cliente[]
   porPagina?: number
 }
 
-export function CampanhaTable({ campanhas, total, pagina, perfil, porPagina = ITENS_POR_PAGINA }: CampanhaTableProps) {
+export function CampanhaTable({ campanhas, total, pagina, perfil, clientes, porPagina = ITENS_POR_PAGINA }: CampanhaTableProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const [sheetCampanha, setSheetCampanha] = useState<Campanha | null>(null)
+  const [sheetMode, setSheetMode] = useState<'ver' | 'editar' | 'nova' | null>(null)
 
   const podeGerenciar = ['admin', 'gerente', 'vendedor'].includes(perfil)
   const totalPaginas = Math.max(1, Math.ceil(total / porPagina))
@@ -69,6 +74,11 @@ export function CampanhaTable({ campanhas, total, pagina, perfil, porPagina = IT
     return new Date(d + 'T00:00:00').toLocaleDateString('pt-BR')
   }
 
+  function abrirVer(c: Campanha) { setSheetCampanha(c); setSheetMode('ver') }
+  function abrirEditar(c: Campanha) { setSheetCampanha(c); setSheetMode('editar') }
+  function abrirNova() { setSheetCampanha(null); setSheetMode('nova') }
+  function fecharSheet() { setSheetMode(null); setSheetCampanha(null) }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-2">
@@ -79,7 +89,7 @@ export function CampanhaTable({ campanhas, total, pagina, perfil, porPagina = IT
           className="h-8 w-56"
         />
         {podeGerenciar && (
-          <Button size="sm" nativeButton={false} render={<Link href="/campanhas/nova" />}>
+          <Button size="sm" onClick={abrirNova}>
             <Plus className="mr-1 size-4" />
             Nova Campanha
           </Button>
@@ -115,12 +125,12 @@ export function CampanhaTable({ campanhas, total, pagina, perfil, porPagina = IT
                   <TableCell className="text-sm">{formatDate(c.data_fim)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
-                      <Button variant="ghost" size="sm" nativeButton={false} render={<Link href={`/campanhas/${c.id}`} />}>
+                      <Button variant="ghost" size="sm" onClick={() => abrirVer(c)}>
                         <Eye className="size-4" />
                         <span className="sr-only">Ver</span>
                       </Button>
                       {podeGerenciar && (
-                        <Button variant="ghost" size="sm" nativeButton={false} render={<Link href={`/campanhas/${c.id}/editar`} />}>
+                        <Button variant="ghost" size="sm" onClick={() => abrirEditar(c)}>
                           <Pencil className="size-4" />
                           <span className="sr-only">Editar</span>
                         </Button>
@@ -141,6 +151,31 @@ export function CampanhaTable({ campanhas, total, pagina, perfil, porPagina = IT
           <Button variant="outline" size="sm" disabled={pagina >= totalPaginas || isPending} onClick={handleProximaPagina}>Próxima</Button>
         </div>
       </div>
+
+      {sheetCampanha && (
+        <CampanhaSheetDetalhe
+          key={sheetCampanha.id}
+          campanha={sheetCampanha}
+          open={sheetMode === 'ver'}
+          onClose={fecharSheet}
+          onEditar={() => setSheetMode('editar')}
+          podeEditar={podeGerenciar}
+        />
+      )}
+      {sheetCampanha && (
+        <CampanhaSheetForm
+          key={`edit-${sheetCampanha.id}`}
+          campanha={sheetCampanha}
+          clientes={clientes}
+          open={sheetMode === 'editar'}
+          onClose={fecharSheet}
+        />
+      )}
+      <CampanhaSheetForm
+        clientes={clientes}
+        open={sheetMode === 'nova'}
+        onClose={fecharSheet}
+      />
     </div>
   )
 }

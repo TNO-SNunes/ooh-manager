@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { CampanhaTable } from '@/components/campanhas/campanha-table'
-import type { Campanha, PerfilUsuario } from '@/types'
+import type { Campanha, Cliente, PerfilUsuario } from '@/types'
 
 const POR_PAGINA = 20
 
@@ -36,7 +36,14 @@ export default async function CampanhasPage({
 
   if (params.q) query = query.ilike('nome', `%${params.q}%`)
 
-  const { data: campanhas, count } = await query
+  const [{ data: campanhas, count }, { data: clientes }] = await Promise.all([
+    query,
+    supabase
+      .from('clientes')
+      .select('id, nome')
+      .eq('empresa_id', perfil.empresa_id)
+      .order('nome'),
+  ])
 
   return (
     <div className="space-y-4">
@@ -46,6 +53,7 @@ export default async function CampanhasPage({
         total={count ?? 0}
         pagina={pagina}
         perfil={perfil.perfil as PerfilUsuario}
+        clientes={(clientes ?? []) as Cliente[]}
         porPagina={POR_PAGINA}
       />
     </div>

@@ -1,15 +1,16 @@
 'use client'
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import { useCallback, useTransition, useRef } from 'react'
+import { useCallback, useTransition, useRef, useState } from 'react'
 import { Eye, Pencil, Plus } from 'lucide-react'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   Table, TableBody, TableCell, TableHead,
   TableHeader, TableRow,
 } from '@/components/ui/table'
+import { ClienteSheetDetalhe } from '@/components/clientes/cliente-sheet-detalhe'
+import { ClienteSheetForm } from '@/components/clientes/cliente-sheet-form'
 import type { Cliente, PerfilUsuario } from '@/types'
 
 interface ClienteTableProps {
@@ -26,6 +27,9 @@ export function ClienteTable({ clientes, total, pagina, perfil, porPagina }: Cli
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const [sheetCliente, setSheetCliente] = useState<Cliente | null>(null)
+  const [sheetMode, setSheetMode] = useState<'ver' | 'editar' | 'novo' | null>(null)
 
   const podeGerenciar = perfil === 'admin' || perfil === 'gerente' || perfil === 'vendedor'
   const totalPaginas = Math.max(1, Math.ceil(total / porPagina))
@@ -62,6 +66,11 @@ export function ClienteTable({ clientes, total, pagina, perfil, porPagina }: Cli
     startTransition(() => router.push(buildUrl({ pagina: String(pagina + 1) })))
   }
 
+  function abrirVer(c: Cliente) { setSheetCliente(c); setSheetMode('ver') }
+  function abrirEditar(c: Cliente) { setSheetCliente(c); setSheetMode('editar') }
+  function abrirNovo() { setSheetCliente(null); setSheetMode('novo') }
+  function fecharSheet() { setSheetMode(null); setSheetCliente(null) }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-2">
@@ -72,7 +81,7 @@ export function ClienteTable({ clientes, total, pagina, perfil, porPagina }: Cli
           className="h-8 w-56"
         />
         {podeGerenciar && (
-          <Button size="sm" nativeButton={false} render={<Link href="/clientes/novo" />}>
+          <Button size="sm" onClick={abrirNovo}>
             <Plus className="mr-1 size-4" />
             Novo Cliente
           </Button>
@@ -106,12 +115,12 @@ export function ClienteTable({ clientes, total, pagina, perfil, porPagina }: Cli
                   <TableCell className="text-sm">{c.telefone ?? '—'}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-1">
-                      <Button variant="ghost" size="sm" nativeButton={false} render={<Link href={`/clientes/${c.id}`} />}>
+                      <Button variant="ghost" size="sm" onClick={() => abrirVer(c)}>
                         <Eye className="size-4" />
                         <span className="sr-only">Ver</span>
                       </Button>
                       {podeGerenciar && (
-                        <Button variant="ghost" size="sm" nativeButton={false} render={<Link href={`/clientes/${c.id}/editar`} />}>
+                        <Button variant="ghost" size="sm" onClick={() => abrirEditar(c)}>
                           <Pencil className="size-4" />
                           <span className="sr-only">Editar</span>
                         </Button>
@@ -132,6 +141,29 @@ export function ClienteTable({ clientes, total, pagina, perfil, porPagina }: Cli
           <Button variant="outline" size="sm" disabled={pagina >= totalPaginas || isPending} onClick={handleProximaPagina}>Próxima</Button>
         </div>
       </div>
+
+      {sheetCliente && (
+        <ClienteSheetDetalhe
+          key={sheetCliente.id}
+          cliente={sheetCliente}
+          open={sheetMode === 'ver'}
+          onClose={fecharSheet}
+          onEditar={() => setSheetMode('editar')}
+          podeEditar={podeGerenciar}
+        />
+      )}
+      {sheetCliente && (
+        <ClienteSheetForm
+          key={`edit-${sheetCliente.id}`}
+          cliente={sheetCliente}
+          open={sheetMode === 'editar'}
+          onClose={fecharSheet}
+        />
+      )}
+      <ClienteSheetForm
+        open={sheetMode === 'novo'}
+        onClose={fecharSheet}
+      />
     </div>
   )
 }

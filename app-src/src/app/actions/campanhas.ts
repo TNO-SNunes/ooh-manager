@@ -8,6 +8,7 @@ import { validarCampanha } from '@/lib/campanhas/validacoes'
 export type ActionState = {
   error?: string
   fieldErrors?: Record<string, string>
+  ok?: boolean
 }
 
 function parseCampos(formData: FormData) {
@@ -91,6 +92,74 @@ export async function editarCampanha(
   revalidatePath('/campanhas')
   revalidatePath(`/campanhas/${id}`)
   redirect(`/campanhas/${id}`)
+}
+
+export async function criarCampanhaAction(
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: perfil } = await supabase
+    .from('usuarios')
+    .select('empresa_id, perfil')
+    .eq('id', user.id)
+    .single()
+
+  if (!perfil || !['admin', 'gerente', 'vendedor'].includes(perfil.perfil)) {
+    return { error: 'Sem permissão para criar campanhas.' }
+  }
+
+  const campos = parseCampos(formData)
+  const fieldErrors = validarCampanha(campos)
+  if (fieldErrors) return { fieldErrors }
+
+  const { error } = await supabase.from('campanhas').insert({
+    ...campos,
+    empresa_id: perfil.empresa_id,
+  })
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/campanhas')
+  return { ok: true }
+}
+
+export async function editarCampanhaAction(
+  id: string,
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: perfil } = await supabase
+    .from('usuarios')
+    .select('empresa_id, perfil')
+    .eq('id', user.id)
+    .single()
+
+  if (!perfil || !['admin', 'gerente', 'vendedor'].includes(perfil.perfil)) {
+    return { error: 'Sem permissão.' }
+  }
+
+  const campos = parseCampos(formData)
+  const fieldErrors = validarCampanha(campos)
+  if (fieldErrors) return { fieldErrors }
+
+  const { error } = await supabase
+    .from('campanhas')
+    .update(campos)
+    .eq('id', id)
+    .eq('empresa_id', perfil.empresa_id)
+
+  if (error) return { error: error.message }
+
+  revalidatePath('/campanhas')
+  return { ok: true }
 }
 
 export async function excluirCampanha(id: string): Promise<ActionState> {

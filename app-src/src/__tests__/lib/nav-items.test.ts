@@ -6,6 +6,8 @@ describe('getNavItems', () => {
     const hrefs = getNavItems('admin').map(i => i.href)
     expect(hrefs).toContain('/')
     expect(hrefs).toContain('/inventario')
+    expect(hrefs).toContain('/clientes')
+    expect(hrefs).toContain('/campanhas')
     expect(hrefs).toContain('/reservas')
     expect(hrefs).toContain('/os')
     expect(hrefs).toContain('/relatorios')
@@ -13,19 +15,23 @@ describe('getNavItems', () => {
     expect(hrefs).toContain('/configuracoes')
   })
 
-  it('vendedor não recebe inventario, os ou usuarios', () => {
+  it('vendedor recebe clientes e campanhas mas não inventario, os ou usuarios', () => {
     const hrefs = getNavItems('vendedor').map(i => i.href)
     expect(hrefs).not.toContain('/inventario')
     expect(hrefs).not.toContain('/os')
     expect(hrefs).not.toContain('/usuarios')
+    expect(hrefs).toContain('/clientes')
+    expect(hrefs).toContain('/campanhas')
     expect(hrefs).toContain('/reservas')
     expect(hrefs).toContain('/relatorios')
     expect(hrefs).toContain('/configuracoes')
   })
 
-  it('midia recebe inventario, reservas, os e relatorios', () => {
+  it('midia recebe inventario, clientes, campanhas, reservas, os e relatorios', () => {
     const hrefs = getNavItems('midia').map(i => i.href)
     expect(hrefs).toContain('/inventario')
+    expect(hrefs).toContain('/clientes')
+    expect(hrefs).toContain('/campanhas')
     expect(hrefs).toContain('/reservas')
     expect(hrefs).toContain('/os')
     expect(hrefs).toContain('/relatorios')
