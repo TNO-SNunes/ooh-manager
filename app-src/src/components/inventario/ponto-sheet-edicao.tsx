@@ -47,7 +47,7 @@ export function PontoSheetEdicao({ ponto, open, onClose }: PontoSheetEdicaoProps
       onClose()
       router.refresh()
     }
-  }, [state.ok])
+  }, [state.ok, onClose, router])
 
   const err = (campo: string) => state.fieldErrors?.[campo]
   const isOutdoor = tipo === 'outdoor'
@@ -294,9 +294,9 @@ export function PontoSheetEdicao({ ponto, open, onClose }: PontoSheetEdicaoProps
           {/* Tabuleta (Outdoor) */}
           {isOutdoor && (
             <div className="space-y-1.5">
-              <Label htmlFor="se-painel">Tabuleta Nº</Label>
+              <Label htmlFor="se-painel-outdoor">Tabuleta Nº</Label>
               <Input
-                id="se-painel"
+                id="se-painel-outdoor"
                 name="numero_painel"
                 type="number"
                 min={1}
@@ -308,9 +308,9 @@ export function PontoSheetEdicao({ ponto, open, onClose }: PontoSheetEdicaoProps
           {/* Painel (Frontlight / Empena) */}
           {isFrontlightOrEmpena && (
             <div className="space-y-1.5">
-              <Label htmlFor="se-painel">Painel Nº</Label>
+              <Label htmlFor="se-painel-frontlight">Painel Nº</Label>
               <Input
-                id="se-painel"
+                id="se-painel-frontlight"
                 name="numero_painel"
                 type="number"
                 min={1}
