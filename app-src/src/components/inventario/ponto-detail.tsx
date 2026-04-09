@@ -52,7 +52,7 @@ export function PontoDetail({ ponto, perfil }: PontoDetailProps) {
     <div className="space-y-6">
       {/* Top action bar */}
       <div className="flex items-center gap-2 flex-wrap">
-        <Button variant="ghost" size="sm" render={<Link href="/inventario" />}>
+        <Button variant="ghost" size="sm" nativeButton={false} render={<Link href="/inventario" />}>
           <ArrowLeft className="size-4 mr-1" />
           Voltar
         </Button>
@@ -60,7 +60,7 @@ export function PontoDetail({ ponto, perfil }: PontoDetailProps) {
         <div className="flex-1" />
 
         {podeEditar && (
-          <Button variant="outline" size="sm" render={<Link href={`/inventario/${ponto.id}/editar`} />}>
+          <Button variant="outline" size="sm" nativeButton={false} render={<Link href={`/inventario/${ponto.id}/editar`} />}>
             <Pencil className="size-4 mr-1" />
             Editar
           </Button>

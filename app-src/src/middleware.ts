@@ -1,8 +1,8 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PUBLIC_ROUTES = ['/login', '/login/reset']
-
+// O middleware só atualiza cookies de sessão (refresh token).
+// Proteção de rotas é feita nos layouts/pages via getUser().
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
@@ -25,21 +25,10 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
-
-  const isPublicRoute = PUBLIC_ROUTES.some(route =>
-    request.nextUrl.pathname.startsWith(route)
-  )
-
-  if (!user && !isPublicRoute) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('redirect', request.nextUrl.pathname)
-    return NextResponse.redirect(loginUrl)
-  }
-
-  if (user && request.nextUrl.pathname === '/login') {
-    return NextResponse.redirect(new URL('/', request.url))
-  }
+  // Necessário para manter a sessão atualizada — não remover.
+  // Não usar getUser() aqui pois causa lentidão no Edge runtime.
+  // Os redirecionamentos são feitos nos layouts.
+  await supabase.auth.getSession()
 
   return supabaseResponse
 }
