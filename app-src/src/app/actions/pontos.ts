@@ -112,7 +112,7 @@ export async function criarPonto(
       .select('codigo')
       .eq('empresa_id', perfil.empresa_id)
     const codigos = (existentes ?? []).map((p: { codigo: string }) => p.codigo)
-    dados.codigo = gerarCodigo(dados.municipio, codigos)
+    dados.codigo = gerarCodigo(dados.municipio, dados.tipo!, codigos)
   }
 
   const { data: ponto, error } = await supabase
@@ -298,7 +298,7 @@ export async function importarPontos(
     }
 
     if (!dados.codigo && dados.municipio) {
-      dados.codigo = gerarCodigo(dados.municipio, [...codigosExistentes, ...validos.map(v => v.codigo!).filter(Boolean)])
+      dados.codigo = gerarCodigo(dados.municipio, dados.tipo!, [...codigosExistentes, ...validos.map(v => v.codigo!).filter(Boolean)])
     }
 
     if (dados.codigo && codigosExistentes.includes(dados.codigo)) {
