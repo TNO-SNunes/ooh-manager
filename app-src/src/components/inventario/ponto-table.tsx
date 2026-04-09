@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
-import { useCallback, useTransition, useRef } from 'react'
+import { useCallback, useTransition, useRef, useState } from 'react'
 import { Eye, Pencil, Download, Plus, Upload, MapPin } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -25,6 +25,8 @@ import {
 import { nomeLegivel } from '@/lib/pontos/actions'
 import { exportarPontosAction, type FiltrosPontos } from '@/app/actions/pontos'
 import type { PontoMidia, PerfilUsuario, TipoPonto, StatusPonto } from '@/types'
+import { PontoSheetDetalhe } from '@/components/inventario/ponto-sheet-detalhe'
+import { PontoSheetEdicao } from '@/components/inventario/ponto-sheet-edicao'
 
 const ITENS_POR_PAGINA = 20
 
@@ -63,6 +65,24 @@ export function PontoTable({
   const searchParams = useSearchParams()
   const [isPending, startTransition] = useTransition()
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  type SheetMode = 'ver' | 'editar' | null
+  const [sheetPonto, setSheetPonto] = useState<PontoMidia | null>(null)
+  const [sheetMode, setSheetMode] = useState<SheetMode>(null)
+
+  function abrirVer(ponto: PontoMidia) {
+    setSheetPonto(ponto)
+    setSheetMode('ver')
+  }
+
+  function abrirEditar(ponto: PontoMidia) {
+    setSheetPonto(ponto)
+    setSheetMode('editar')
+  }
+
+  function fecharSheet() {
+    setSheetMode(null)
+  }
 
   const podeAdminGerente = perfil === 'admin' || perfil === 'gerente'
   const podeExportar = perfil === 'admin' || perfil === 'gerente' || perfil === 'midia'
@@ -287,7 +307,7 @@ export function PontoTable({
                       <Button
                         variant="ghost"
                         size="sm"
-                        nativeButton={false} render={<Link href={`/inventario/${ponto.id}`} />}
+                        onClick={() => abrirVer(ponto)}
                       >
                         <Eye className="size-4" />
                         <span className="sr-only">Ver</span>
@@ -296,7 +316,7 @@ export function PontoTable({
                         <Button
                           variant="ghost"
                           size="sm"
-                          nativeButton={false} render={<Link href={`/inventario/${ponto.id}/editar`} />}
+                          onClick={() => abrirEditar(ponto)}
                         >
                           <Pencil className="size-4" />
                           <span className="sr-only">Editar</span>
@@ -351,6 +371,24 @@ export function PontoTable({
           </Button>
         </div>
       </div>
+      {sheetPonto && (
+        <PontoSheetDetalhe
+          key={`detalhe-${sheetPonto.id}`}
+          ponto={sheetPonto}
+          open={sheetMode === 'ver'}
+          onClose={fecharSheet}
+          onEditar={() => setSheetMode('editar')}
+          podeEditar={podeAdminGerente}
+        />
+      )}
+      {sheetPonto && (
+        <PontoSheetEdicao
+          key={sheetPonto.id}
+          ponto={sheetPonto}
+          open={sheetMode === 'editar'}
+          onClose={fecharSheet}
+        />
+      )}
     </div>
   )
 }
