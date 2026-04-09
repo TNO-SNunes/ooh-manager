@@ -10,6 +10,7 @@ import type { PontoMidia, TipoPonto, StatusPonto } from '@/types'
 export type ActionState = {
   error?: string
   fieldErrors?: Record<string, string>
+  ok?: boolean
 }
 
 // ─── helpers ────────────────────────────────────────────────
@@ -112,7 +113,7 @@ export async function criarPonto(
       .select('codigo')
       .eq('empresa_id', perfil.empresa_id)
     const codigos = (existentes ?? []).map((p: { codigo: string }) => p.codigo)
-    dados.codigo = gerarCodigo(dados.municipio, codigos)
+    dados.codigo = gerarCodigo(dados.municipio, dados.tipo!, codigos)
   }
 
   const { data: ponto, error } = await supabase
@@ -198,6 +199,47 @@ export async function editarPonto(
   }
 
   redirect(`/inventario/${id}`)
+}
+
+export async function editarPontoAction(
+  id: string,
+  _prev: ActionState,
+  formData: FormData
+): Promise<ActionState> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { error: 'Não autorizado' }
+
+  const { data: perfil } = await supabase
+    .from('usuarios')
+    .select('empresa_id, perfil')
+    .eq('id', user.id)
+    .single()
+
+  if (!perfil || !['admin', 'gerente'].includes(perfil.perfil)) {
+    return { error: 'Sem permissão' }
+  }
+
+  const dados = formDataToPonto(formData)
+  const erros = validarPonto(dados)
+  if (erros.length > 0) {
+    const fieldErrors: Record<string, string> = {}
+    erros.forEach(e => { fieldErrors[e.campo] = e.mensagem })
+    return { fieldErrors }
+  }
+
+  const { error } = await supabase
+    .from('pontos_midia')
+    .update(dados)
+    .eq('id', id)
+    .eq('empresa_id', perfil.empresa_id)
+
+  if (error) {
+    if (error.code === '23505') return { error: 'Código já existe para esta empresa' }
+    return { error: error.message }
+  }
+
+  return { ok: true }
 }
 
 export async function excluirPonto(id: string): Promise<ActionState> {
@@ -298,7 +340,7 @@ export async function importarPontos(
     }
 
     if (!dados.codigo && dados.municipio) {
-      dados.codigo = gerarCodigo(dados.municipio, [...codigosExistentes, ...validos.map(v => v.codigo!).filter(Boolean)])
+      dados.codigo = gerarCodigo(dados.municipio, dados.tipo!, [...codigosExistentes, ...validos.map(v => v.codigo!).filter(Boolean)])
     }
 
     if (dados.codigo && codigosExistentes.includes(dados.codigo)) {

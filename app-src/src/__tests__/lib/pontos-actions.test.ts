@@ -24,22 +24,38 @@ describe('normalizarMunicipio', () => {
 })
 
 describe('gerarCodigo', () => {
-  it('gera código com prefixo e sequencial 001 quando não há existentes', () => {
-    expect(gerarCodigo('Rio de Janeiro', [])).toBe('RIO-001')
+  it('outdoor gera T-MUN-001 quando não há existentes', () => {
+    expect(gerarCodigo('Rio de Janeiro', 'outdoor', [])).toBe('T-RIO-001')
   })
 
-  it('incrementa a partir do maior existente', () => {
-    expect(gerarCodigo('Rio de Janeiro', ['RIO-001', 'RIO-002'])).toBe('RIO-003')
-    expect(gerarCodigo('São Paulo', ['SAO-001', 'SAO-003'])).toBe('SAO-004')
+  it('frontlight gera F-MUN-001 quando não há existentes', () => {
+    expect(gerarCodigo('Rio de Janeiro', 'frontlight', [])).toBe('F-RIO-001')
   })
 
-  it('ignora códigos de outros prefixos', () => {
-    expect(gerarCodigo('Niterói', ['RIO-001', 'SAO-002'])).toBe('NIT-001')
+  it('empena gera F-MUN-002 quando há F-RIO-001 existente (sequência compartilhada com frontlight)', () => {
+    expect(gerarCodigo('Rio de Janeiro', 'empena', ['F-RIO-001'])).toBe('F-RIO-002')
+  })
+
+  it('led gera L-MUN-001 e não conflita com F-MUN-001', () => {
+    expect(gerarCodigo('Rio de Janeiro', 'led', ['F-RIO-001'])).toBe('L-RIO-001')
+  })
+
+  it('outdoor gera T-MUN-001 e não conflita com F-MUN-001 ou L-MUN-001', () => {
+    expect(gerarCodigo('Rio de Janeiro', 'outdoor', ['F-RIO-001', 'L-RIO-001'])).toBe('T-RIO-001')
+  })
+
+  it('incrementa a partir do maior existente do mesmo prefixo-município', () => {
+    expect(gerarCodigo('Rio de Janeiro', 'outdoor', ['T-RIO-001', 'T-RIO-002'])).toBe('T-RIO-003')
+    expect(gerarCodigo('São Paulo', 'led', ['L-SAO-001', 'L-SAO-003'])).toBe('L-SAO-004')
+  })
+
+  it('ignora códigos de outros municípios', () => {
+    expect(gerarCodigo('Niterói', 'outdoor', ['T-RIO-001', 'T-SAO-002'])).toBe('T-NIT-001')
   })
 
   it('formata sequencial com 3 dígitos e zeros à esquerda', () => {
-    const existentes = Array.from({ length: 9 }, (_, i) => `RIO-00${i + 1}`)
-    expect(gerarCodigo('Rio de Janeiro', existentes)).toBe('RIO-010')
+    const existentes = Array.from({ length: 9 }, (_, i) => `F-RIO-00${i + 1}`)
+    expect(gerarCodigo('Rio de Janeiro', 'frontlight', existentes)).toBe('F-RIO-010')
   })
 })
 

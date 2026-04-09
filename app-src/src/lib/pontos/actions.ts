@@ -12,19 +12,27 @@ export function normalizarMunicipio(municipio: string): string {
   return normalizado.slice(0, 3).padEnd(3, 'X')
 }
 
-export function gerarCodigo(municipio: string, existentes: string[]): string {
-  const prefixo = normalizarMunicipio(municipio)
-  const doMesmoPrefixo = existentes.filter(c => c.startsWith(`${prefixo}-`))
+const TIPO_PREFIXO: Record<TipoPonto, string> = {
+  outdoor: 'T',
+  frontlight: 'F',
+  empena: 'F',
+  led: 'L',
+}
+
+export function gerarCodigo(municipio: string, tipo: TipoPonto, existentes: string[]): string {
+  const tipoPrefixo = TIPO_PREFIXO[tipo]
+  const munPrefixo = normalizarMunicipio(municipio)
+  const chave = `${tipoPrefixo}-${munPrefixo}-`
+  const doMesmaChave = existentes.filter(c => c.startsWith(chave))
 
   let maximo = 0
-  for (const codigo of doMesmoPrefixo) {
+  for (const codigo of doMesmaChave) {
     const partes = codigo.split('-')
     const num = parseInt(partes[partes.length - 1], 10)
     if (!isNaN(num) && num > maximo) maximo = num
   }
 
-  const proximo = maximo + 1
-  return `${prefixo}-${String(proximo).padStart(3, '0')}`
+  return `${chave}${String(maximo + 1).padStart(3, '0')}`
 }
 
 export function nomeLegivel(
