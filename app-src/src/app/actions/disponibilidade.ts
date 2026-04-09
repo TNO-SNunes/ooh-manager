@@ -35,7 +35,10 @@ export async function consultarDisponibilidade(
     .eq('status', 'ativo')
     .order('codigo')
 
-  if (filtros.tipo) pontosQuery = pontosQuery.eq('tipo', filtros.tipo)
+  const TIPOS_VALIDOS = ['outdoor', 'frontlight', 'empena', 'led']
+  if (filtros.tipo && TIPOS_VALIDOS.includes(filtros.tipo)) {
+    pontosQuery = pontosQuery.eq('tipo', filtros.tipo)
+  }
   if (filtros.cidade) pontosQuery = pontosQuery.eq('cidade', filtros.cidade)
 
   const { data: pontos } = await pontosQuery
