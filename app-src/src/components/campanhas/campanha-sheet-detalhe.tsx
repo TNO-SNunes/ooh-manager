@@ -10,6 +10,12 @@ import {
 } from '@/components/ui/sheet'
 import type { Campanha } from '@/types'
 
+const TIPOS_LABEL: Record<string, string> = {
+  outdoor: 'Outdoor',
+  frontlight_empena: 'Frontlight / Empena',
+  led: 'LED / DOOH',
+}
+
 function formatDate(d?: string | null) {
   if (!d) return '—'
   return new Date(d + 'T00:00:00').toLocaleDateString('pt-BR')
@@ -55,6 +61,19 @@ export function CampanhaSheetDetalhe({
               <dd>{formatDate(campanha.data_fim)}</dd>
             </dl>
           </section>
+
+          {campanha.tipos && campanha.tipos.length > 0 && (
+            <section className="space-y-2">
+              <h2 className="text-sm font-medium text-muted-foreground">Tipos de veículo</h2>
+              <div className="flex flex-wrap gap-1.5">
+                {campanha.tipos.map(t => (
+                  <span key={t} className="rounded-md bg-muted px-2 py-0.5 text-xs">
+                    {TIPOS_LABEL[t] ?? t}
+                  </span>
+                ))}
+              </div>
+            </section>
+          )}
 
           {campanha.cliente?.nome && (
             <section className="space-y-2">

@@ -16,12 +16,14 @@ function parseCampos(formData: FormData) {
     const v = formData.get(k)
     return v ? String(v).trim() : undefined
   }
+  const tipos = formData.getAll('tipos').map(String).filter(Boolean)
   return {
     nome: get('nome'),
     cliente_id: get('cliente_id'),
     descricao: get('descricao') || null,
     data_inicio: get('data_inicio') || null,
     data_fim: get('data_fim') || null,
+    tipos,
   }
 }
 

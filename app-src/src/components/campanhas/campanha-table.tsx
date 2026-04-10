@@ -6,6 +6,13 @@ import { Eye, Pencil, Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
   Table, TableBody, TableCell, TableHead,
   TableHeader, TableRow,
 } from '@/components/ui/table'
@@ -14,6 +21,12 @@ import { CampanhaSheetForm } from '@/components/campanhas/campanha-sheet-form'
 import type { Campanha, Cliente, PerfilUsuario } from '@/types'
 
 const ITENS_POR_PAGINA = 20
+
+const TIPOS_LABEL: Record<string, string> = {
+  outdoor: 'Outdoor',
+  frontlight_empena: 'Frontlight/Empena',
+  led: 'LED',
+}
 
 interface CampanhaTableProps {
   campanhas: Campanha[]
@@ -37,6 +50,8 @@ export function CampanhaTable({ campanhas, total, pagina, perfil, clientes, porP
   const podeGerenciar = ['admin', 'gerente', 'vendedor'].includes(perfil)
   const totalPaginas = Math.max(1, Math.ceil(total / porPagina))
   const q = searchParams.get('q') ?? ''
+  const clienteFiltro = searchParams.get('cliente') ?? ''
+  const statusFiltro = searchParams.get('status') ?? ''
 
   const buildUrl = useCallback(
     (updates: Record<string, string>) => {
@@ -59,6 +74,14 @@ export function CampanhaTable({ campanhas, total, pagina, perfil, clientes, porP
     }, 400)
   }
 
+  function handleClienteChange(value: string) {
+    startTransition(() => router.push(buildUrl({ cliente: value === 'todos' ? '' : value })))
+  }
+
+  function handleStatusChange(value: string) {
+    startTransition(() => router.push(buildUrl({ status: value === 'todas' ? '' : value })))
+  }
+
   function handlePaginaAnterior() {
     if (pagina <= 1) return
     startTransition(() => router.push(buildUrl({ pagina: String(pagina - 1) })))
@@ -79,21 +102,64 @@ export function CampanhaTable({ campanhas, total, pagina, perfil, clientes, porP
   function abrirNova() { setSheetCampanha(null); setSheetMode('nova') }
   function fecharSheet() { setSheetMode(null); setSheetCampanha(null) }
 
+  const clienteFiltroNome = clientes.find(c => c.id === clienteFiltro)?.nome
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-2">
+      {/* Barra de ferramentas */}
+      <div className="flex flex-wrap items-center gap-2">
         <Input
           placeholder="Buscar por nome…"
           defaultValue={q}
           onChange={handleSearchChange}
-          className="h-8 w-56"
+          className="h-8 w-48"
         />
-        {podeGerenciar && (
-          <Button size="sm" onClick={abrirNova}>
-            <Plus className="mr-1 size-4" />
-            Nova Campanha
-          </Button>
-        )}
+
+        {/* Filtro por cliente */}
+        <Select
+          value={clienteFiltro || 'todos'}
+          onValueChange={handleClienteChange}
+          disabled={isPending}
+        >
+          <SelectTrigger className="h-8 w-44">
+            <SelectValue placeholder="Todos os clientes">
+              {clienteFiltro ? clienteFiltroNome : 'Todos os clientes'}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos os clientes</SelectItem>
+            {clientes.map((c) => (
+              <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Filtro por status */}
+        <Select
+          value={statusFiltro || 'todas'}
+          onValueChange={handleStatusChange}
+          disabled={isPending}
+        >
+          <SelectTrigger className="h-8 w-36">
+            <SelectValue placeholder="Todas">
+              {statusFiltro === 'vigente' ? 'Vigentes' : statusFiltro === 'vencida' ? 'Vencidas' : 'Todas'}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todas">Todas</SelectItem>
+            <SelectItem value="vigente">Vigentes</SelectItem>
+            <SelectItem value="vencida">Vencidas</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <div className="ml-auto">
+          {podeGerenciar && (
+            <Button size="sm" onClick={abrirNova}>
+              <Plus className="mr-1 size-4" />
+              Nova Campanha
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className={isPending ? 'opacity-60 pointer-events-none' : ''}>
@@ -102,6 +168,7 @@ export function CampanhaTable({ campanhas, total, pagina, perfil, clientes, porP
             <TableRow>
               <TableHead>Nome</TableHead>
               <TableHead>Cliente</TableHead>
+              <TableHead>Tipos</TableHead>
               <TableHead>Início</TableHead>
               <TableHead>Fim</TableHead>
               <TableHead className="text-right">Ações</TableHead>
@@ -110,7 +177,7 @@ export function CampanhaTable({ campanhas, total, pagina, perfil, clientes, porP
           <TableBody>
             {campanhas.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
                   Nenhuma campanha encontrada.
                 </TableCell>
               </TableRow>
@@ -120,6 +187,11 @@ export function CampanhaTable({ campanhas, total, pagina, perfil, clientes, porP
                   <TableCell className="font-medium">{c.nome}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {c.cliente?.nome ?? '—'}
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">
+                    {c.tipos && c.tipos.length > 0
+                      ? c.tipos.map(t => TIPOS_LABEL[t] ?? t).join(', ')
+                      : '—'}
                   </TableCell>
                   <TableCell className="text-sm">{formatDate(c.data_inicio)}</TableCell>
                   <TableCell className="text-sm">{formatDate(c.data_fim)}</TableCell>

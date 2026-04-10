@@ -30,7 +30,7 @@ export default async function DashboardPage() {
         {DASH_LABELS[profile?.perfil ?? ''] ?? 'Dashboard'}
       </p>
       <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
-        Dashboard em construção — Sprint 2
+        Métricas e resumos em breve.
       </div>
     </div>
   )

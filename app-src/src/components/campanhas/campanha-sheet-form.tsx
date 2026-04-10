@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
@@ -23,6 +24,12 @@ import {
 import { criarCampanhaAction, editarCampanhaAction, type ActionState } from '@/app/actions/campanhas'
 import type { Campanha, Cliente } from '@/types'
 
+const TIPOS_OPCOES = [
+  { value: 'outdoor',          label: 'Outdoor' },
+  { value: 'frontlight_empena',label: 'Frontlight / Empena' },
+  { value: 'led',              label: 'LED / DOOH' },
+] as const
+
 interface CampanhaSheetFormProps {
   campanha?: Campanha
   clientes: Cliente[]
@@ -35,6 +42,7 @@ export function CampanhaSheetForm({ campanha, clientes, open, onClose }: Campanh
   const isEdit = Boolean(campanha)
 
   const [clienteId, setClienteId] = useState<string>(campanha?.cliente_id ?? '')
+  const [tipos, setTipos] = useState<string[]>(campanha?.tipos ?? [])
 
   const action = isEdit
     ? (_prev: ActionState, formData: FormData) => editarCampanhaAction(campanha!.id, _prev, formData)
@@ -49,7 +57,14 @@ export function CampanhaSheetForm({ campanha, clientes, open, onClose }: Campanh
     }
   }, [state.ok, onClose, router])
 
+  function toggleTipo(value: string) {
+    setTipos(prev =>
+      prev.includes(value) ? prev.filter(t => t !== value) : [...prev, value]
+    )
+  }
+
   const err = (campo: string) => state.fieldErrors?.[campo]
+  const clienteNome = clientes.find(c => c.id === clienteId)?.nome
 
   return (
     <Sheet open={open} onOpenChange={(isOpen) => { if (!isOpen) onClose() }}>
@@ -66,6 +81,9 @@ export function CampanhaSheetForm({ campanha, clientes, open, onClose }: Campanh
           className="flex-1 overflow-y-auto p-4 space-y-4"
         >
           <input type="hidden" name="cliente_id" value={clienteId} />
+          {tipos.map(t => (
+            <input key={t} type="hidden" name="tipos" value={t} />
+          ))}
 
           {state.error && (
             <div className="rounded-lg border border-destructive bg-destructive/10 px-3 py-2 text-sm text-destructive">
@@ -81,7 +99,9 @@ export function CampanhaSheetForm({ campanha, clientes, open, onClose }: Campanh
               disabled={pending || isEdit}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Selecione um cliente" />
+                <SelectValue placeholder="Selecione um cliente">
+                  {clienteNome}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {clientes.map((c) => (
@@ -104,6 +124,28 @@ export function CampanhaSheetForm({ campanha, clientes, open, onClose }: Campanh
               disabled={pending}
             />
             {err('nome') && <p className="text-xs text-destructive">{err('nome')}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label>Tipos de veículo</Label>
+            <div className="space-y-2">
+              {TIPOS_OPCOES.map(({ value, label }) => (
+                <div key={value} className="flex items-center gap-2">
+                  <Checkbox
+                    id={`tipo-${value}`}
+                    checked={tipos.includes(value)}
+                    onCheckedChange={() => toggleTipo(value)}
+                    disabled={pending}
+                  />
+                  <label
+                    htmlFor={`tipo-${value}`}
+                    className="text-sm cursor-pointer select-none"
+                  >
+                    {label}
+                  </label>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-1.5">

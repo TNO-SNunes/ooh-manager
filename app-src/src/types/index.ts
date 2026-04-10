@@ -115,6 +115,7 @@ export interface Campanha {
   arte_url?: string
   data_inicio?: string
   data_fim?: string
+  tipos?: string[]
   ativo: boolean
   criado_em: string
   // joins
