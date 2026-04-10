@@ -52,6 +52,7 @@ export function CampanhaTable({ campanhas, total, pagina, perfil, clientes, porP
   const q = searchParams.get('q') ?? ''
   const clienteFiltro = searchParams.get('cliente') ?? ''
   const statusFiltro = searchParams.get('status') ?? ''
+  const tipoFiltro = searchParams.get('tipo') ?? ''
 
   const buildUrl = useCallback(
     (updates: Record<string, string>) => {
@@ -80,6 +81,10 @@ export function CampanhaTable({ campanhas, total, pagina, perfil, clientes, porP
 
   function handleStatusChange(value: string) {
     startTransition(() => router.push(buildUrl({ status: value === 'todas' ? '' : value })))
+  }
+
+  function handleTipoChange(value: string) {
+    startTransition(() => router.push(buildUrl({ tipo: value === 'todos' ? '' : value })))
   }
 
   function handlePaginaAnterior() {
@@ -131,6 +136,25 @@ export function CampanhaTable({ campanhas, total, pagina, perfil, clientes, porP
             {clientes.map((c) => (
               <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
             ))}
+          </SelectContent>
+        </Select>
+
+        {/* Filtro por tipo */}
+        <Select
+          value={tipoFiltro || 'todos'}
+          onValueChange={handleTipoChange}
+          disabled={isPending}
+        >
+          <SelectTrigger className="h-8 w-44">
+            <SelectValue placeholder="Todos os tipos">
+              {tipoFiltro ? (TIPOS_LABEL[tipoFiltro] ?? tipoFiltro) : 'Todos os tipos'}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Todos os tipos</SelectItem>
+            <SelectItem value="outdoor">Outdoor</SelectItem>
+            <SelectItem value="frontlight_empena">Frontlight / Empena</SelectItem>
+            <SelectItem value="led">LED / DOOH</SelectItem>
           </SelectContent>
         </Select>
 

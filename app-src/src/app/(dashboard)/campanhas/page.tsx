@@ -8,7 +8,7 @@ const POR_PAGINA = 20
 export default async function CampanhasPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; pagina?: string; cliente?: string; status?: string }>
+  searchParams: Promise<{ q?: string; pagina?: string; cliente?: string; status?: string; tipo?: string }>
 }) {
   const params = await searchParams
   const supabase = await createClient()
@@ -40,6 +40,7 @@ export default async function CampanhasPage({
   if (params.cliente) query = query.eq('cliente_id', params.cliente)
   if (params.status === 'vigente') query = query.or(`data_fim.is.null,data_fim.gte.${hoje}`)
   if (params.status === 'vencida') query = query.lt('data_fim', hoje)
+  if (params.tipo) query = query.contains('tipos', [params.tipo])
 
   const [{ data: campanhas, count }, { data: clientes }] = await Promise.all([
     query,
