@@ -52,7 +52,7 @@ const ALL_SECTIONS: NavSection[] = [
         children: [
           { label: 'Nova Reserva',       href: '/reservas/nova',    icon: PlusCircle },
           { label: 'Minhas Reservas',    href: '/reservas/minhas',  icon: List },
-          { label: 'Todas as Reservas',  href: '/reservas',         icon: CalendarCheck },
+          { label: 'Todas as Reservas',  href: '/reservas/todas',   icon: CalendarCheck },
           { label: 'Fila de Aprovação',  href: '/aprovacoes',       icon: CheckSquare },
         ],
       },
@@ -71,17 +71,23 @@ const ALL_SECTIONS: NavSection[] = [
 ]
 
 const ALLOWED: Record<PerfilUsuario, string[]> = {
-  admin:    ['/', '/inventario', '/clientes', '/campanhas', '/calendario', '/calendario/led', '/calendario/frontlight', '/calendario/outdoor', '/reservas', '/reservas/nova', '/reservas/minhas', '/aprovacoes', '/disponibilidade', '/os', '/relatorios', '/usuarios', '/configuracoes'],
-  gerente:  ['/', '/inventario', '/clientes', '/campanhas', '/calendario', '/calendario/led', '/calendario/frontlight', '/calendario/outdoor', '/reservas', '/reservas/nova', '/reservas/minhas', '/aprovacoes', '/disponibilidade', '/os', '/relatorios', '/usuarios', '/configuracoes'],
-  vendedor: ['/', '/clientes', '/campanhas', '/calendario', '/calendario/led', '/calendario/frontlight', '/calendario/outdoor', '/reservas', '/reservas/nova', '/reservas/minhas', '/disponibilidade', '/relatorios', '/configuracoes'],
-  midia:    ['/', '/inventario', '/clientes', '/campanhas', '/reservas', '/os', '/relatorios', '/configuracoes'],
+  admin:    ['/', '/inventario', '/clientes', '/campanhas', '/calendario', '/calendario/led', '/calendario/frontlight', '/calendario/outdoor', '/reservas/nova', '/reservas/minhas', '/reservas/todas', '/aprovacoes', '/disponibilidade', '/os', '/relatorios', '/usuarios', '/configuracoes'],
+  gerente:  ['/', '/inventario', '/clientes', '/campanhas', '/calendario', '/calendario/led', '/calendario/frontlight', '/calendario/outdoor', '/reservas/nova', '/reservas/minhas', '/reservas/todas', '/aprovacoes', '/disponibilidade', '/os', '/relatorios', '/usuarios', '/configuracoes'],
+  vendedor: ['/', '/clientes', '/campanhas', '/calendario', '/calendario/led', '/calendario/frontlight', '/calendario/outdoor', '/reservas/nova', '/reservas/minhas', '/disponibilidade', '/relatorios', '/configuracoes'],
+  midia:    ['/', '/inventario', '/clientes', '/campanhas', '/os', '/relatorios', '/configuracoes'],
   funcionario: [],
   checkin:     [],
 }
 
 function filterItems(items: NavItem[], allowed: Set<string>): NavItem[] {
   return items
-    .filter(item => allowed.has(item.href))
+    .filter(item => {
+      if (item.children && item.children.length > 0) {
+        // Grupo: visível se pelo menos um filho está em ALLOWED
+        return item.children.some(c => allowed.has(c.href))
+      }
+      return allowed.has(item.href)
+    })
     .map(item => ({
       ...item,
       children: item.children ? filterItems(item.children, allowed) : undefined,

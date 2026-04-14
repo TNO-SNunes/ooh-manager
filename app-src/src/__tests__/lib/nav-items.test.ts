@@ -57,6 +57,20 @@ describe('getNavItems', () => {
     expect(getNavItems('funcionario')).toHaveLength(0)
     expect(getNavItems('checkin')).toHaveLength(0)
   })
+
+  it('gerente tem /aprovacoes e /usuarios', () => {
+    const items = getNavItems('gerente')
+    const res = items.find(i => i.href === '/reservas')
+    expect(res?.children?.map(c => c.href)).toContain('/aprovacoes')
+    const hrefs = items.map(i => i.href)
+    expect(hrefs).toContain('/usuarios')
+  })
+
+  it('vendedor não vê Todas as Reservas (/reservas/todas)', () => {
+    const res = getNavItems('vendedor').find(i => i.href === '/reservas')
+    const subHrefs = res?.children?.map(c => c.href) ?? []
+    expect(subHrefs).not.toContain('/reservas/todas')
+  })
 })
 
 describe('getNavSections', () => {

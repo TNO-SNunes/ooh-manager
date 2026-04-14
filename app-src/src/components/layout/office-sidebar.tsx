@@ -2,19 +2,23 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getNavSections } from '@/components/layout/nav-items'
 import type { NavItem, NavSection } from '@/components/layout/nav-items'
 import type { PerfilUsuario } from '@/types'
 
-function NavItemRow({ item, depth = 0 }: { item: NavItem; depth?: number }) {
+function NavItemRow({ item }: { item: NavItem }) {
   const pathname = usePathname()
   const hasChildren = item.children && item.children.length > 0
   const isActive = pathname === item.href
   const isChildActive = item.children?.some(c => pathname === c.href) ?? false
   const [open, setOpen] = useState(isChildActive)
+
+  useEffect(() => {
+    if (isChildActive) setOpen(true)
+  }, [isChildActive])
 
   if (hasChildren) {
     return (
@@ -35,7 +39,7 @@ function NavItemRow({ item, depth = 0 }: { item: NavItem; depth?: number }) {
         {open && (
           <div className="ml-4">
             {item.children!.map(child => (
-              <NavItemRow key={child.href} item={child} depth={depth + 1} />
+              <NavItemRow key={child.href} item={child} />
             ))}
           </div>
         )}
