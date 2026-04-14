@@ -144,6 +144,12 @@ export interface Reserva {
   vendedor?: Usuario
 }
 
+export interface ReservaComJoins extends Reserva {
+  ponto: PontoMidia
+  campanha: Campanha & { cliente: Cliente }
+  vendedor: Usuario
+}
+
 export interface OrdemServico {
   id: string
   empresa_id: string
