@@ -78,6 +78,15 @@ describe('corCelulaOutdoor', () => {
   })
 })
 
+describe('corCelulaFrontlight', () => {
+  it('sem reserva → livre', () => {
+    expect(corCelulaFrontlight(null)).toBe('livre')
+  })
+  it('status ativa → ativa', () => {
+    expect(corCelulaFrontlight('ativa')).toBe('ativa')
+  })
+})
+
 describe('corCelulaLed', () => {
   it('sem reserva → livre', () => {
     expect(corCelulaLed(null, '2026-04-01', '2026-04-30', '2026-04-15')).toBe('livre')
@@ -90,5 +99,8 @@ describe('corCelulaLed', () => {
   })
   it('solicitada → solicitada independente de data', () => {
     expect(corCelulaLed('solicitada', '2026-04-01', '2026-04-30', '2026-04-15')).toBe('solicitada')
+  })
+  it('ativa com período futuro → veiculando (reserva contratada ainda não iniciada)', () => {
+    expect(corCelulaLed('ativa', '2026-08-01', '2026-08-31', '2026-04-15')).toBe('veiculando')
   })
 })

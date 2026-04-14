@@ -1,4 +1,6 @@
-const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
+import { StatusReserva } from '@/types'
+
+const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'] as const
 
 export interface ColunaBissemana {
   ano: number
@@ -72,18 +74,19 @@ export function labelMes(ano: number, mes: number): string {
 
 export type CorCelula = 'livre' | 'ativa' | 'solicitada' | 'veiculando' | 'vencida'
 
-export function corCelulaOutdoor(status: string | null): CorCelula {
+export function corCelulaOutdoor(status: StatusReserva | null): CorCelula {
   if (!status) return 'livre'
   if (status === 'solicitada') return 'solicitada'
-  return 'ativa'
+  if (status === 'ativa') return 'ativa'
+  return 'livre' // rejeitada, cancelada, finalizada
 }
 
-export function corCelulaFrontlight(status: string | null): CorCelula {
+export function corCelulaFrontlight(status: StatusReserva | null): CorCelula {
   return corCelulaOutdoor(status)
 }
 
 export function corCelulaLed(
-  status: string | null,
+  status: StatusReserva | null,
   dataInicio: string,
   dataFim: string,
   hoje: string
