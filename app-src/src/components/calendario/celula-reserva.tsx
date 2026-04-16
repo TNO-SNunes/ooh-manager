@@ -9,7 +9,7 @@ const COR_CLASSES: Record<CorCelula, string> = {
   vencida:    'bg-red-500 text-white',
 }
 
-interface CelulaReservaProps {
+export interface CelulaReservaProps {
   cor: CorCelula
   linhas?: string[]
   className?: string

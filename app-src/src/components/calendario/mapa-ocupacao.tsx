@@ -12,7 +12,7 @@ export interface LinhaMapa {
   cells: React.ReactNode[]
 }
 
-interface MapaOcupacaoProps {
+export interface MapaOcupacaoProps {
   colunas: ColunaMapa[]
   linhas: LinhaMapa[]
   titulo?: string

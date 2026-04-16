@@ -15,7 +15,7 @@ function yearOptions() {
   return [now - 1, now, now + 1, now + 2].map(y => ({ value: String(y), label: String(y) }))
 }
 
-interface FiltrosMapaProps {
+export interface FiltrosMapaProps {
   mesInicio: number
   anoInicio: number
   mesFim: number
