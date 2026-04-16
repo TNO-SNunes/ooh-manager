@@ -159,6 +159,10 @@ export async function cancelarReservaAction(id: string): Promise<ActionState> {
 
   if (!perfil) redirect('/login')
 
+  if (!['admin', 'gerente', 'vendedor'].includes(perfil.perfil)) {
+    return { error: 'Sem permissão para cancelar reservas.' }
+  }
+
   // vendedor só cancela as próprias; gerente/admin cancela qualquer uma
   let query = supabase
     .from('reservas')
