@@ -61,7 +61,7 @@ export default async function CalendarioLedPage({
         const linhasTexto = reserva ? [
           `${reserva.campanha?.cliente?.nome ?? '—'}`,
           reserva.campanha?.nome ?? '',
-          `${reserva.data_inicio.slice(5).replace('-', '/')} – ${reserva.data_fim.slice(5).replace('-', '/')}`,
+          `${reserva.data_inicio.slice(8)}/${reserva.data_inicio.slice(5, 7)} – ${reserva.data_fim.slice(8)}/${reserva.data_fim.slice(5, 7)}`,
           vendedorNome,
         ].filter(Boolean) : []
         return <CelulaReserva key={`${col.ano}-${col.mes}`} cor={cor} linhas={linhasTexto} />

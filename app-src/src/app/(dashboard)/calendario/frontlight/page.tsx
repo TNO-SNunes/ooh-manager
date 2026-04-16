@@ -60,7 +60,7 @@ export default async function CalendarioFrontlightPage({
         : corCelulaFrontlight('ativa')
 
       const linhasTexto = reservasMes.flatMap(r => [
-        `${r.data_inicio.slice(5).replace('-', '/')}–${r.data_fim.slice(5).replace('-', '/')}`,
+        `${r.data_inicio.slice(8)}/${r.data_inicio.slice(5, 7)}–${r.data_fim.slice(8)}/${r.data_fim.slice(5, 7)}`,
         `${r.campanha?.cliente?.nome ?? '—'}`,
         r.vendedor?.nome?.split(' ')[0] ?? '',
       ])
