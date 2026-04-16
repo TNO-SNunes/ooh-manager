@@ -78,8 +78,9 @@ export function FiltrosMapa({ mesInicio, anoInicio, mesFim, anoFim }: FiltrosMap
         defaultValue={searchParams.get('q') ?? ''}
         className="h-8 w-48"
         onChange={e => {
+          const value = e.target.value
           if (debounceRef.current) clearTimeout(debounceRef.current)
-          debounceRef.current = setTimeout(() => push({ q: e.target.value }), 400)
+          debounceRef.current = setTimeout(() => push({ q: value }), 400)
         }}
         disabled={isPending}
       />

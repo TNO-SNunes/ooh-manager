@@ -6,7 +6,7 @@ const COR_CLASSES: Record<CorCelula, string> = {
   ativa:      'bg-red-500 text-white',
   solicitada: 'bg-blue-200 text-blue-900',
   veiculando: 'bg-green-500 text-white',
-  vencida:    'bg-red-500 text-white',
+  vencida:    'bg-gray-300 text-gray-600 dark:bg-gray-700 dark:text-gray-400',
 }
 
 export interface CelulaReservaProps {
