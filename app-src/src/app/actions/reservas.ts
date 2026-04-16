@@ -89,7 +89,7 @@ export async function aprovarReservaAction(id: string): Promise<ActionState> {
     .eq('id', user.id)
     .single()
 
-  if (!perfil || !['admin', 'gerente'].includes(perfil.perfil)) {
+  if (!perfil || !['admin', 'gerente', 'midia'].includes(perfil.perfil)) {
     return { error: 'Sem permissão para aprovar reservas.' }
   }
 
@@ -123,7 +123,7 @@ export async function rejeitarReservaAction(
     .eq('id', user.id)
     .single()
 
-  if (!perfil || !['admin', 'gerente'].includes(perfil.perfil)) {
+  if (!perfil || !['admin', 'gerente', 'midia'].includes(perfil.perfil)) {
     return { error: 'Sem permissão para rejeitar reservas.' }
   }
 
@@ -171,8 +171,9 @@ export async function cancelarReservaAction(id: string): Promise<ActionState> {
     query = query.eq('vendedor_id', user.id)
   }
 
-  const { error } = await query
+  const { data, error } = await query.select('id')
   if (error) return { error: error.message }
+  if (!data || data.length === 0) return { error: 'Reserva não encontrada ou já não pode ser cancelada.' }
 
   revalidatePath('/reservas')
   revalidatePath('/aprovacoes')
@@ -180,10 +181,18 @@ export async function cancelarReservaAction(id: string): Promise<ActionState> {
 }
 
 export async function getReservasComJoins(
-  empresaId: string,
   filtros: { vendedorId?: string; status?: string[] } = {}
 ) {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: perfil } = await supabase
+    .from('usuarios')
+    .select('empresa_id, perfil')
+    .eq('id', user.id)
+    .single()
+  if (!perfil) redirect('/login')
 
   let query = supabase
     .from('reservas')
@@ -193,7 +202,7 @@ export async function getReservasComJoins(
       campanha:campanhas(*, cliente:clientes(*)),
       vendedor:usuarios!reservas_vendedor_id_fkey(id, nome, perfil)
     `)
-    .eq('empresa_id', empresaId)
+    .eq('empresa_id', perfil.empresa_id)
     .order('solicitado_em', { ascending: false })
 
   if (filtros.vendedorId) query = query.eq('vendedor_id', filtros.vendedorId)

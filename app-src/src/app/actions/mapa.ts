@@ -38,7 +38,11 @@ export async function getDadosMapa(
     .order('codigo')
 
   if (busca) {
-    pontosQuery = pontosQuery.or(`codigo.ilike.%${busca}%,nome.ilike.%${busca}%,endereco.ilike.%${busca}%`)
+    // Sanitizar para evitar que caracteres especiais do PostgREST quebrem o filtro
+    const buscaSanitizada = busca.trim().replace(/[,().]/g, '')
+    if (buscaSanitizada) {
+      pontosQuery = pontosQuery.or(`codigo.ilike.%${buscaSanitizada}%,nome.ilike.%${buscaSanitizada}%,endereco.ilike.%${buscaSanitizada}%`)
+    }
   }
 
   const { data: pontos } = await pontosQuery

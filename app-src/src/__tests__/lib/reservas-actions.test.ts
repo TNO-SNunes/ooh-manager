@@ -27,4 +27,14 @@ describe('validarCamposReserva', () => {
     const r = validarCamposReserva({ ...base, data_inicio: '2026-05-15', data_fim: '2026-05-01' })
     expect(r?.data_fim).toBeDefined()
   })
+
+  it('sem data_inicio → erro data_inicio', () => {
+    const r = validarCamposReserva({ ...base, data_inicio: undefined })
+    expect(r?.data_inicio).toBeDefined()
+  })
+
+  it('sem data_fim → erro data_fim', () => {
+    const r = validarCamposReserva({ ...base, data_fim: undefined })
+    expect(r?.data_fim).toBeDefined()
+  })
 })
