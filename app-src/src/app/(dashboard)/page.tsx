@@ -1,5 +1,8 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { getReservasComJoins } from '@/app/actions/reservas'
+import { WidgetAprovacoes } from '@/components/dashboard/widget-aprovacoes'
+import type { ReservaComJoins } from '@/types'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -21,6 +24,15 @@ export default async function DashboardPage() {
     midia: 'Fila de auditoria',
   }
 
+  let reservasPendentes: ReservaComJoins[] = []
+  if (['admin', 'gerente', 'midia'].includes(profile?.perfil ?? '')) {
+    try {
+      reservasPendentes = await getReservasComJoins({ status: ['solicitada'] }) as ReservaComJoins[]
+    } catch {
+      // widget shows empty state
+    }
+  }
+
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">
@@ -29,6 +41,9 @@ export default async function DashboardPage() {
       <p className="text-sm text-muted-foreground">
         {DASH_LABELS[profile?.perfil ?? ''] ?? 'Dashboard'}
       </p>
+      {['admin', 'gerente', 'midia'].includes(profile?.perfil ?? '') && (
+        <WidgetAprovacoes reservas={reservasPendentes} />
+      )}
       <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
         Métricas e resumos em breve.
       </div>
