@@ -75,16 +75,16 @@ export function CampanhaTable({ campanhas, total, pagina, perfil, clientes, porP
     }, 400)
   }
 
-  function handleClienteChange(value: string) {
-    startTransition(() => router.push(buildUrl({ cliente: value === 'todos' ? '' : value })))
+  function handleClienteChange(value: string | null) {
+    startTransition(() => router.push(buildUrl({ cliente: !value || value === 'todos' ? '' : value })))
   }
 
-  function handleStatusChange(value: string) {
-    startTransition(() => router.push(buildUrl({ status: value === 'todas' ? '' : value })))
+  function handleStatusChange(value: string | null) {
+    startTransition(() => router.push(buildUrl({ status: !value || value === 'todas' ? '' : value })))
   }
 
-  function handleTipoChange(value: string) {
-    startTransition(() => router.push(buildUrl({ tipo: value === 'todos' ? '' : value })))
+  function handleTipoChange(value: string | null) {
+    startTransition(() => router.push(buildUrl({ tipo: !value || value === 'todos' ? '' : value })))
   }
 
   function handlePaginaAnterior() {

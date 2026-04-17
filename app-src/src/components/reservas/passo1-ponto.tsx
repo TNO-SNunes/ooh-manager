@@ -44,7 +44,7 @@ export function Passo1EscolhaPonto({ pontos, pontoSelecionado, onSelecionar, onP
             size="sm"
             onClick={() => setTipoFiltro(t)}
           >
-            {t === 'todos' ? 'Todos' : TIPO_LABEL[t]}
+            {t === 'todos' ? 'Todos' : TIPO_LABEL[t as TipoPonto]}
           </Button>
         ))}
       </div>
