@@ -74,7 +74,7 @@ const ALLOWED: Record<PerfilUsuario, string[]> = {
   admin:    ['/', '/inventario', '/clientes', '/campanhas', '/calendario', '/calendario/led', '/calendario/frontlight', '/calendario/outdoor', '/reservas/nova', '/reservas/minhas', '/reservas/todas', '/aprovacoes', '/disponibilidade', '/os', '/relatorios', '/usuarios', '/configuracoes'],
   gerente:  ['/', '/inventario', '/clientes', '/campanhas', '/calendario', '/calendario/led', '/calendario/frontlight', '/calendario/outdoor', '/reservas/nova', '/reservas/minhas', '/reservas/todas', '/aprovacoes', '/disponibilidade', '/os', '/relatorios', '/usuarios', '/configuracoes'],
   vendedor: ['/', '/clientes', '/campanhas', '/calendario', '/calendario/led', '/calendario/frontlight', '/calendario/outdoor', '/reservas/nova', '/reservas/minhas', '/disponibilidade', '/relatorios', '/configuracoes'],
-  midia:    ['/', '/inventario', '/clientes', '/campanhas', '/os', '/relatorios', '/configuracoes'],
+  midia:    ['/', '/inventario', '/clientes', '/campanhas', '/aprovacoes', '/os', '/relatorios', '/configuracoes'],
   funcionario: [],
   checkin:     [],
 }
