@@ -28,9 +28,9 @@ export function WidgetAprovacoes({ reservas }: WidgetAprovacoesProps) {
       ) : (
         <ul className="space-y-2">
           {visiveis.map((r) => {
-            const diaInicio = r.data_inicio.slice(8)
+            const diaInicio = r.data_inicio.slice(8, 10)
             const mesInicio = r.data_inicio.slice(5, 7)
-            const diaFim = r.data_fim.slice(8)
+            const diaFim = r.data_fim.slice(8, 10)
             const mesFim = r.data_fim.slice(5, 7)
             const vendedorNome = r.vendedor?.nome?.split(' ')[0] ?? ''
 
