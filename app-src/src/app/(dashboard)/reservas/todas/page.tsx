@@ -17,17 +17,23 @@ export default async function TodasReservasPage() {
 
   if (!perfil) redirect('/login')
 
-  if (!['admin', 'gerente'].includes(perfil.perfil)) {
+  if (!['admin', 'gerente', 'midia'].includes(perfil.perfil)) {
     redirect('/reservas/minhas')
   }
 
-  const reservas = await getReservasComJoins({})
+  let reservas: ReservaComJoins[] = []
+  try {
+    reservas = await getReservasComJoins({}) as ReservaComJoins[]
+  } catch (e) {
+    console.error('Erro ao carregar reservas:', e)
+    // reservas stays empty, the empty state will handle it gracefully
+  }
 
   return (
     <div className="space-y-4">
       <h1 className="text-xl font-semibold">Todas as Reservas</h1>
       <ReservaTable
-        reservas={reservas as ReservaComJoins[]}
+        reservas={reservas}
         perfilUsuario={perfil.perfil as PerfilUsuario}
         mostrarVendedor={true}
       />

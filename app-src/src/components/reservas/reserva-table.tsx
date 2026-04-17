@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import {
@@ -8,7 +8,7 @@ import {
   TableHeader, TableRow,
 } from '@/components/ui/table'
 import { cancelarReservaAction, aprovarReservaAction, rejeitarReservaAction } from '@/app/actions/reservas'
-import type { ReservaComJoins, PerfilUsuario } from '@/types'
+import type { ReservaComJoins, PerfilUsuario, StatusReserva } from '@/types'
 
 interface ReservaTableProps {
   reservas: ReservaComJoins[]
@@ -16,7 +16,7 @@ interface ReservaTableProps {
   mostrarVendedor?: boolean
 }
 
-const STATUS_LABELS: Record<string, string> = {
+const STATUS_LABELS: Record<StatusReserva, string> = {
   solicitada: 'Solicitada',
   ativa: 'Ativa',
   rejeitada: 'Rejeitada',
@@ -24,7 +24,7 @@ const STATUS_LABELS: Record<string, string> = {
   finalizada: 'Finalizada',
 }
 
-const STATUS_CLASSES: Record<string, string> = {
+const STATUS_CLASSES: Record<StatusReserva, string> = {
   solicitada: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
   ativa: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
   rejeitada: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
@@ -40,6 +40,7 @@ export function ReservaTable({ reservas, perfilUsuario, mostrarVendedor = false 
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [pendingRowId, setPendingRowId] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
 
   // Rejection dialog state
   const [rejeicaoRowId, setRejeicaoRowId] = useState<string | null>(null)
@@ -50,21 +51,41 @@ export function ReservaTable({ reservas, perfilUsuario, mostrarVendedor = false 
   const podeAprovar = ['admin', 'gerente', 'midia'].includes(perfilUsuario)
   const podeRejeitar = ['admin', 'gerente', 'midia'].includes(perfilUsuario)
 
+  // Close modal on Escape key
+  useEffect(() => {
+    if (!rejeicaoRowId) return
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setRejeicaoRowId(null)
+    }
+    document.addEventListener('keydown', handleKey)
+    return () => document.removeEventListener('keydown', handleKey)
+  }, [rejeicaoRowId])
+
   function handleCancelar(id: string) {
     setPendingRowId(id)
     startTransition(async () => {
-      await cancelarReservaAction(id)
+      const result = await cancelarReservaAction(id)
       setPendingRowId(null)
-      router.refresh()
+      if ('error' in result && result.error) {
+        setActionError(result.error)
+      } else {
+        setActionError(null)
+        router.refresh()
+      }
     })
   }
 
   function handleAprovar(id: string) {
     setPendingRowId(id)
     startTransition(async () => {
-      await aprovarReservaAction(id)
+      const result = await aprovarReservaAction(id)
       setPendingRowId(null)
-      router.refresh()
+      if ('error' in result && result.error) {
+        setActionError(result.error)
+      } else {
+        setActionError(null)
+        router.refresh()
+      }
     })
   }
 
@@ -91,9 +112,14 @@ export function ReservaTable({ reservas, perfilUsuario, mostrarVendedor = false 
     setPendingRowId(id)
     setRejeicaoRowId(null)
     startTransition(async () => {
-      await rejeitarReservaAction(id, motivo)
+      const result = await rejeitarReservaAction(id, motivo)
       setPendingRowId(null)
-      router.refresh()
+      if ('error' in result && result.error) {
+        setActionError(result.error)
+      } else {
+        setActionError(null)
+        router.refresh()
+      }
     })
   }
 
@@ -105,10 +131,15 @@ export function ReservaTable({ reservas, perfilUsuario, mostrarVendedor = false 
     )
   }
 
-  const colSpan = mostrarVendedor ? 6 : 5
-
   return (
     <>
+      {actionError && (
+        <div className="rounded-md border border-destructive bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {actionError}
+          <button type="button" className="ml-2 underline" onClick={() => setActionError(null)}>fechar</button>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
@@ -129,10 +160,10 @@ export function ReservaTable({ reservas, perfilUsuario, mostrarVendedor = false 
                   {/* Ponto */}
                   <TableCell className="text-sm">
                     <div className="font-medium">
-                      {r.ponto.codigo} ({r.ponto.tipo})
+                      {r.ponto?.codigo ?? '—'} ({r.ponto?.tipo ?? ''})
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {r.ponto.endereco ?? r.ponto.nome}
+                      {r.ponto?.endereco ?? r.ponto?.nome ?? ''}
                     </div>
                   </TableCell>
 
@@ -143,13 +174,13 @@ export function ReservaTable({ reservas, perfilUsuario, mostrarVendedor = false 
 
                   {/* Cliente / Campanha */}
                   <TableCell className="text-sm">
-                    <div className="font-semibold">{r.campanha.cliente.nome}</div>
-                    <div className="text-xs text-muted-foreground">{r.campanha.nome}</div>
+                    <div className="font-semibold">{r.campanha?.cliente?.nome ?? '—'}</div>
+                    <div className="text-xs text-muted-foreground">{r.campanha?.nome ?? '—'}</div>
                   </TableCell>
 
                   {/* Vendedor — condicional */}
                   {mostrarVendedor && (
-                    <TableCell className="text-sm">{r.vendedor.nome}</TableCell>
+                    <TableCell className="text-sm">{r.vendedor?.nome ?? '—'}</TableCell>
                   )}
 
                   {/* Status */}
@@ -168,7 +199,7 @@ export function ReservaTable({ reservas, perfilUsuario, mostrarVendedor = false 
                         <Button
                           variant="outline"
                           size="sm"
-                          disabled={isRowPending}
+                          disabled={isPending}
                           onClick={() => handleCancelar(r.id)}
                         >
                           Cancelar
@@ -178,7 +209,7 @@ export function ReservaTable({ reservas, perfilUsuario, mostrarVendedor = false 
                         <Button
                           variant="default"
                           size="sm"
-                          disabled={isRowPending}
+                          disabled={isPending}
                           onClick={() => handleAprovar(r.id)}
                         >
                           Aprovar
@@ -188,7 +219,7 @@ export function ReservaTable({ reservas, perfilUsuario, mostrarVendedor = false 
                         <Button
                           variant="destructive"
                           size="sm"
-                          disabled={isRowPending}
+                          disabled={isPending}
                           onClick={() => abrirRejeicao(r.id)}
                         >
                           Rejeitar
@@ -207,21 +238,31 @@ export function ReservaTable({ reservas, perfilUsuario, mostrarVendedor = false 
       {rejeicaoRowId && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          aria-hidden="true"
           onClick={(e) => { if (e.target === e.currentTarget) fecharRejeicao() }}
         >
-          <div className="w-full max-w-md rounded-lg border bg-background p-6 shadow-lg">
-            <h2 className="mb-1 text-base font-semibold">Rejeitar reserva</h2>
+          <div
+            className="w-full max-w-md rounded-lg border bg-background p-6 shadow-lg"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-rejeicao-titulo"
+          >
+            <h2 id="modal-rejeicao-titulo" className="mb-1 text-base font-semibold">Rejeitar reserva</h2>
             <p className="mb-4 text-sm text-muted-foreground">
               Informe o motivo da rejeição (obrigatório, mínimo 10 caracteres).
             </p>
             <textarea
+              id="motivo-rejeicao"
+              aria-label="Motivo da rejeição"
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               rows={4}
               placeholder="Descreva o motivo da rejeição…"
               value={motivoRejeicao}
               onChange={(e) => {
                 setMotivoRejeicao(e.target.value)
-                if (rejeicaoError) setRejeicaoError('')
+                if (rejeicaoError && e.target.value.trim().length >= 10) {
+                  setRejeicaoError('')
+                }
               }}
             />
             {rejeicaoError && (

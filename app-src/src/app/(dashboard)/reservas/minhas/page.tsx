@@ -19,7 +19,13 @@ export default async function MinhasReservasPage() {
 
   if (!perfil) redirect('/login')
 
-  const reservas = await getReservasComJoins({ vendedorId: user.id })
+  let reservas: ReservaComJoins[] = []
+  try {
+    reservas = await getReservasComJoins({ vendedorId: user.id }) as ReservaComJoins[]
+  } catch (e) {
+    console.error('Erro ao carregar reservas:', e)
+    // reservas stays empty, the empty state will handle it gracefully
+  }
 
   return (
     <div className="space-y-4">
@@ -30,7 +36,7 @@ export default async function MinhasReservasPage() {
         </Button>
       </div>
       <ReservaTable
-        reservas={reservas as ReservaComJoins[]}
+        reservas={reservas}
         perfilUsuario={perfil.perfil as PerfilUsuario}
         mostrarVendedor={false}
       />
