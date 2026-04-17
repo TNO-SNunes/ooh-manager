@@ -24,13 +24,15 @@ describe('getNavItems', () => {
     )
   })
 
-  it('admin tem subitens de reservas incluindo aprovações', () => {
+  it('admin tem subitens de reservas e aprovações como item raiz', () => {
     const items = getNavItems('admin')
     const res = items.find(i => i.href === '/reservas')
     const hrefs = res?.children?.map(c => c.href) ?? []
     expect(hrefs).toContain('/reservas/nova')
     expect(hrefs).toContain('/reservas/minhas')
-    expect(hrefs).toContain('/aprovacoes')
+    // aprovações agora é item raiz, não subitem de reservas
+    const allHrefs = items.map(i => i.href)
+    expect(allHrefs).toContain('/aprovacoes')
   })
 
   it('vendedor não tem /aprovacoes nem /inventario', () => {
@@ -58,11 +60,10 @@ describe('getNavItems', () => {
     expect(getNavItems('checkin')).toHaveLength(0)
   })
 
-  it('gerente tem /aprovacoes e /usuarios', () => {
+  it('gerente tem /aprovacoes como item raiz e /usuarios', () => {
     const items = getNavItems('gerente')
-    const res = items.find(i => i.href === '/reservas')
-    expect(res?.children?.map(c => c.href)).toContain('/aprovacoes')
     const hrefs = items.map(i => i.href)
+    expect(hrefs).toContain('/aprovacoes')
     expect(hrefs).toContain('/usuarios')
   })
 
