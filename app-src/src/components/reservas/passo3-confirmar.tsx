@@ -25,6 +25,7 @@ export function Passo3Confirmar({
 }: Passo3Props) {
   const router = useRouter()
   const [clienteSelecionado, setClienteSelecionado] = useState('')
+  const [campanhaSelecionada, setCampanhaSelecionada] = useState('')
   const [campanhas, setCampanhas] = useState<Campanha[]>([])
 
   const [state, formAction, pending] = useActionState<ActionState, FormData>(
@@ -40,6 +41,7 @@ export function Passo3Confirmar({
 
   function handleClienteChange(id: string) {
     setClienteSelecionado(id)
+    setCampanhaSelecionada('')
     setCampanhas(campanhasPorCliente[id] ?? [])
   }
 
@@ -88,6 +90,9 @@ export function Passo3Confirmar({
             id="p3-campanha"
             name="campanha_id"
             className="h-9 w-full rounded-md border px-3 text-sm"
+            value={campanhaSelecionada}
+            onChange={e => setCampanhaSelecionada(e.target.value)}
+            required
             disabled={!clienteSelecionado || pending}
           >
             <option value="">Selecione…</option>
@@ -109,7 +114,7 @@ export function Passo3Confirmar({
           <Button type="button" variant="outline" onClick={onVoltar} disabled={pending}>
             Voltar
           </Button>
-          <Button type="submit" disabled={pending}>
+          <Button type="submit" disabled={pending || !clienteSelecionado || !campanhaSelecionada}>
             {pending ? 'Solicitando…' : 'Solicitar Reserva'}
           </Button>
         </div>

@@ -5,9 +5,9 @@ import { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import type { PontoMidia } from '@/types'
+import type { PontoMidia, TipoPonto } from '@/types'
 
-const TIPO_LABEL: Record<string, string> = {
+const TIPO_LABEL: Record<TipoPonto, string> = {
   outdoor: 'Outdoor', frontlight: 'Frontlight', empena: 'Empena', led: 'LED',
 }
 
@@ -39,6 +39,7 @@ export function Passo1EscolhaPonto({ pontos, pontoSelecionado, onSelecionar, onP
         {['todos','outdoor','frontlight','empena','led'].map(t => (
           <Button
             key={t}
+            type="button"
             variant={tipoFiltro === t ? 'default' : 'outline'}
             size="sm"
             onClick={() => setTipoFiltro(t)}
@@ -63,6 +64,7 @@ export function Passo1EscolhaPonto({ pontos, pontoSelecionado, onSelecionar, onP
         ) : filtrados.map(ponto => (
           <button
             key={ponto.id}
+            type="button"
             onClick={() => onSelecionar(ponto)}
             className={`w-full text-left px-4 py-3 hover:bg-muted/50 transition-colors ${
               pontoSelecionado?.id === ponto.id ? 'bg-accent' : ''
@@ -83,7 +85,7 @@ export function Passo1EscolhaPonto({ pontos, pontoSelecionado, onSelecionar, onP
       </div>
 
       <div className="flex justify-end">
-        <Button onClick={onProximo} disabled={!pontoSelecionado}>
+        <Button type="button" onClick={onProximo} disabled={!pontoSelecionado}>
           Próximo
         </Button>
       </div>

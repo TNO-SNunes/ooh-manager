@@ -54,8 +54,8 @@ export async function criarReservaAction(
   if (!ponto) return { error: 'Ponto não encontrado.' }
 
   const validacao = validarPeriodoPorTipo(ponto.tipo as TipoPonto, {
-    data_inicio: new Date(campos.data_inicio!),
-    data_fim: new Date(campos.data_fim!),
+    data_inicio: new Date(campos.data_inicio! + 'T12:00:00'),
+    data_fim: new Date(campos.data_fim! + 'T12:00:00'),
   })
   if (!validacao.valido) return { error: validacao.erro }
 

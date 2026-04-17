@@ -19,12 +19,13 @@ export default async function NovaReservaPage() {
   if (!['admin', 'gerente', 'vendedor'].includes(perfil.perfil)) redirect('/')
 
   // Pontos ativos
-  const { data: pontos } = await supabase
+  const { data: pontos, error: pontosError } = await supabase
     .from('pontos_midia')
     .select('*')
     .eq('empresa_id', perfil.empresa_id)
     .eq('status', 'ativo')
     .order('codigo')
+  if (pontosError) throw pontosError
 
   // Clientes (vendedor só vê os seus)
   let clientesQuery = supabase
@@ -36,7 +37,8 @@ export default async function NovaReservaPage() {
   if (perfil.perfil === 'vendedor') {
     clientesQuery = clientesQuery.eq('vendedor_id', user.id)
   }
-  const { data: clientes } = await clientesQuery
+  const { data: clientes, error: clientesError } = await clientesQuery
+  if (clientesError) throw clientesError
 
   // Campanhas de todos os clientes encontrados
   const clienteIds = (clientes ?? []).map((c: Cliente) => c.id)

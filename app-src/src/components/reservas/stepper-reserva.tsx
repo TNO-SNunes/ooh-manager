@@ -27,7 +27,7 @@ export function StepperReserva({ pontos, clientes, campanhasPorCliente }: Steppe
       {/* Indicador de passos */}
       <div className="flex items-center gap-2">
         {PASSOS.map((label, i) => (
-          <div key={i} className="flex items-center gap-2">
+          <div key={label} className="flex items-center gap-2">
             <div className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium ${
               i === passo
                 ? 'bg-primary text-primary-foreground'
@@ -49,7 +49,12 @@ export function StepperReserva({ pontos, clientes, campanhasPorCliente }: Steppe
         <Passo1EscolhaPonto
           pontos={pontos}
           pontoSelecionado={ponto}
-          onSelecionar={setPonto}
+          onSelecionar={p => {
+            setPonto(p)
+            setSlotNumero(null)
+            setDataInicio('')
+            setDataFim('')
+          }}
           onProximo={() => setPasso(1)}
         />
       )}

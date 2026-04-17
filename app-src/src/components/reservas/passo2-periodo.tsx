@@ -27,6 +27,7 @@ export function Passo2Periodo({
   onVoltar, onProximo, slotsOcupados = [],
 }: Passo2Props) {
   const [erro, setErro] = useState<string | null>(null)
+  const [rawOutdoorDate, setRawOutdoorDate] = useState('')
 
   function handleProximo() {
     if (!dataInicio || !dataFim) { setErro('Selecione o período.'); return }
@@ -58,20 +59,24 @@ export function Passo2Periodo({
           </p>
           <div className="flex gap-4">
             <div className="space-y-1.5">
-              <Label>Data (qualquer dia do mês)</Label>
+              <Label htmlFor="p2-outdoor-date">Data (qualquer dia do mês)</Label>
               <Input
+                id="p2-outdoor-date"
                 type="date"
+                value={rawOutdoorDate}
                 onChange={e => {
-                  if (!e.target.value) return
-                  const d = new Date(e.target.value + 'T12:00:00')
-                  const bissemana = normalizarBissemana(d)
-                  onDataInicio(bissemana.data_inicio.toISOString().slice(0, 10))
-                  onDataFim(bissemana.data_fim.toISOString().slice(0, 10))
+                  setRawOutdoorDate(e.target.value)
+                  if (e.target.value) {
+                    const d = new Date(e.target.value + 'T12:00:00')
+                    const bissemana = normalizarBissemana(d)
+                    onDataInicio(bissemana.data_inicio.toLocaleDateString('sv-SE'))
+                    onDataFim(bissemana.data_fim.toLocaleDateString('sv-SE'))
+                  }
                 }}
               />
             </div>
             <div className="space-y-1.5">
-              <Label>Período calculado</Label>
+              <Label htmlFor="p2-periodo-calc">Período calculado</Label>
               <div className="h-9 rounded-md border bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
                 {dataInicio && dataFim ? `${dataInicio} → ${dataFim}` : 'Selecione uma data'}
               </div>
@@ -81,12 +86,12 @@ export function Passo2Periodo({
       ) : (
         <div className="flex gap-4">
           <div className="space-y-1.5">
-            <Label>Data início</Label>
-            <Input type="date" value={dataInicio} onChange={e => onDataInicio(e.target.value)} />
+            <Label htmlFor="p2-data-inicio">Data início</Label>
+            <Input id="p2-data-inicio" type="date" value={dataInicio} onChange={e => onDataInicio(e.target.value)} />
           </div>
           <div className="space-y-1.5">
-            <Label>Data fim</Label>
-            <Input type="date" value={dataFim} onChange={e => onDataFim(e.target.value)} />
+            <Label htmlFor="p2-data-fim">Data fim</Label>
+            <Input id="p2-data-fim" type="date" value={dataFim} onChange={e => onDataFim(e.target.value)} />
           </div>
         </div>
       )}
@@ -99,13 +104,14 @@ export function Passo2Periodo({
 
       {ponto.tipo === 'led' && (ponto.slots_totais ?? 0) > 0 && (
         <div className="space-y-2">
-          <Label>Slot</Label>
+          <Label htmlFor="p2-slot">Slot</Label>
           <div className="flex flex-wrap gap-2">
             {Array.from({ length: ponto.slots_totais! }, (_, i) => i + 1).map(n => {
               const ocupado = slotsOcupados.includes(n)
               return (
                 <Button
                   key={n}
+                  type="button"
                   variant={slotNumero === n ? 'default' : 'outline'}
                   size="sm"
                   disabled={ocupado}
@@ -125,8 +131,8 @@ export function Passo2Periodo({
       )}
 
       <div className="flex justify-between">
-        <Button variant="outline" onClick={onVoltar}>Voltar</Button>
-        <Button onClick={handleProximo}>Próximo</Button>
+        <Button type="button" variant="outline" onClick={onVoltar}>Voltar</Button>
+        <Button type="button" onClick={handleProximo}>Próximo</Button>
       </div>
     </div>
   )
